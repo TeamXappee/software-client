@@ -25,23 +25,25 @@ export default function UploadingFilesForm({
     setUploadingFilesState("loading");
     const form = e.currentTarget;
     const formData = new FormData(form);
-    const response = await fetch(
-      "http://localhost:8000/api/v1/orders/bulck-add",
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
-    const data = await response.json();
-    handleSetUploadedFiles(JSON.parse(data.data));
-    setFiles(null);
-    setUploadingFilesState("success");
+    const response = await fetch("http://localhost:8000/api/files/upload", {
+      method: "POST",
+      body: formData,
+    });
+    if (response.ok) {
+      const data = await response.json();
+      const files = JSON.parse(data.data);
+      handleSetUploadedFiles(files);
+      setFiles(null);
+      setUploadingFilesState("success");
+    }
   };
 
   return (
     <form onSubmit={handleSubmitFiles} id="files" className="space-y-4">
       <div className="flex justify-between">
-        <p className="font-bold text-xl">Staged files</p>
+        <div className="space-y-2">
+          <p className="font-bold text-xl">Staged files</p>
+        </div>
         {files && files?.length > 0 && (
           <button
             disabled={uploadingFilesState === "loading"}

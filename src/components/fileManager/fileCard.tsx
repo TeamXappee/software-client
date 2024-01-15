@@ -4,13 +4,24 @@ import { File as FileIcon } from "lucide-react";
 export default function FileCard({
   file,
   handleRemoveFile,
+  handleSetActiveFile,
+  activeFile,
 }: {
   file: any;
   handleRemoveFile?: (file: any) => void;
+  handleSetActiveFile?: (filename: string) => void;
+  activeFile?: any;
 }) {
-  const name = file.name || file.originalname;
+  const name = file?.name || file?.originalname || "unkown";
+  const fileActive = name === activeFile?.metadata?.originalname;
   return (
-    <div className="group w-24 h-24 p-2 bg-secondary rounded-lg flex flex-col justify-center items-center gap-1 text-xs relative">
+    <div
+      onClick={() => handleSetActiveFile && handleSetActiveFile(name)}
+      className={`group w-24 h-24 p-2 rounded-lg flex flex-col justify-center items-center gap-1 text-xs relative ${
+        fileActive ? "bg-green-500" : "bg-secondary"
+      }
+      `}
+    >
       {handleRemoveFile && ( //file.name is only available when the file is still in staging and not uploaded to the server
         <button
           onClick={() => handleRemoveFile(file)}
