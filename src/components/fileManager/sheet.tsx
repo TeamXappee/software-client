@@ -11,6 +11,7 @@ import {
 import FileCard from "./fileCard";
 import UploadingFilesForm from "./uploadingFilesForm";
 import { usePathname } from "next/navigation";
+import { File } from "lucide-react";
 export function FileManagerSheet({
   handleSetUploadedFiles,
   filesMetaData,
@@ -27,7 +28,9 @@ export function FileManagerSheet({
   return (
     <Sheet modal={false}>
       <SheetTrigger asChild>
-        <Button variant="outline">Open</Button>
+        <Button variant="outline" className="font-semibold flex gap-2 items-center">
+          <File size={18} /> File Manager
+        </Button>
       </SheetTrigger>
       <SheetContent className="space-y-4 h-[var(--container-height)] mt-[var(--header-height)]">
         <SheetHeader>

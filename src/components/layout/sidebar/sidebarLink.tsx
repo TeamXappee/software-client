@@ -8,13 +8,11 @@ import { Dot } from "lucide-react";
 interface SidebarLinkProps extends LinkProps {
   children: ReactNode | string;
   className?: string;
-  sideBarMin: boolean;
 }
 
 const SidebarLink: React.FC<SidebarLinkProps> = ({
   children,
   className,
-  sideBarMin,
   ...props
 }) => {
   const pathname = usePathname();
@@ -22,13 +20,13 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({
   return (
     <Link
       className={cn(
-        `w-full flex items-center rounded-lg py-2 px-4 text-base font-medium  
+        `w-full flex items-center rounded-lg py-1 px-4 text-base font-medium  
        ${
          isActiveRoute
            ? "bg-muted text-muted-foreground cursor-auto shadow-sm"
            : "hover:bg-muted "
        }
-       ${sideBarMin ? " justify-center" : "justify-between "} `,
+     "justify-between "} `,
         className
       )}
       {...props}
@@ -43,11 +41,8 @@ export default SidebarLink;
 
 export const SideBarLinkText = ({
   children,
-  sideBarMin,
 }: {
   children: string;
-  sideBarMin: boolean;
 }) => {
-  if (sideBarMin) return null;
   return <span>{children}</span>;
 };

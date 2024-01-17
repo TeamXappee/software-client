@@ -102,4 +102,27 @@
     --header-height: 3rem;
     --container-height: calc(100vh - var(--header-height));
   }
+
+  .pretty-scrollbar::-webkit-scrollbar {
+    height: 6px;
+  }
+  
+  /* Track */
+  .pretty-scrollbar::-webkit-scrollbar-track {
+    background: hsl(var(--background));
+    border-radius: 0 1.5rem 1.5rem 0;
+    margin-top: 2px;
+  
+  }
+  
+  /* Handle */
+  .pretty-scrollbar::-webkit-scrollbar-thumb {
+    background: #8d8d8d;
+  
+  }
+  
+  /* Handle on hover */
+  .pretty-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
 }

@@ -4,7 +4,6 @@ import "./globals.css";
 import SessionProvider from "@/contexts/sessionProvider";
 import { ThemeProvider } from "@/contexts/themeProvider";
 import Header from "@/components/layout/header/header";
-import Sidebar from "@/components/layout/sidebar/sidebar";
 import Footer from "@/components/layout/footer/footer";
 import { getCurrentSession } from "../../auth";
 
@@ -27,12 +26,9 @@ export default async function RootLayout({
         <SessionProvider session={session}>
           <ThemeProvider>
             <Header />
-            <div className="flex  w-full">
-              <Sidebar user={session?.user} />
-              <main className="min-h-[var(--container-height)] p-4 w-full">
-                {children}
-              </main>
-            </div>
+            <main className="min-h-[var(--container-height)]  w-full">
+              {children}
+            </main>
             <Footer />
           </ThemeProvider>
         </SessionProvider>

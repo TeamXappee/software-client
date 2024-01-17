@@ -12,7 +12,6 @@ export default function OrdersPage() {
   const handleSetUploadedFiles = (files: any) => {
     setUploadedFiles((prev: any) => (prev ? [...prev, ...files] : files));
   };
-
   return (
     <OrdersContainer
       uploadedFiles={uploadedFiles}
