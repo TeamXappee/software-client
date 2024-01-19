@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import Cell from "./cell";
 import { Button } from "../ui/button";
 
@@ -8,30 +8,25 @@ export default function DataTableContainer({
   handlePreviousPage,
   pageIndex,
   PAGE_SIZE,
+  selectedColumnsHeaders
 }: {
   orders: any;
   handleNextPage: () => void;
   handlePreviousPage: () => void;
   pageIndex: number;
+  selectedColumnsHeaders: string[];
   PAGE_SIZE: number;
 }) {
-  console.log(orders);
   if (!orders) {
     return <p>No data available for view</p>;
   }
 
-  const orderData = orders[0].data || orders[0];
-
-  const allColumnHeaders = Object.keys(orderData);
-  const [selectedColumnsHeaders, setSelectedColumnsHeaders] =
-    useState(allColumnHeaders);
-
   return (
     <div>
-      <div className="overflow-x-auto pretty-scrollbar max-h-[calc(var(--container-height)-125px)]">
+      <div className="overflow-x-auto pretty-scrollbar max-h-[calc(var(--container-height)-100px)]">
         <table className="min-w-full border-collapse border border-input ">
           <thead>
-            <tr className="">
+            <tr className=" text-left">
               {selectedColumnsHeaders.map((header, index) => (
                 <th
                   key={index}
@@ -45,7 +40,7 @@ export default function DataTableContainer({
             </tr>
           </thead>
           <tbody>
-            {orders.map((order: any, index: any) => (
+            {orders.slice(pageIndex, (pageIndex + PAGE_SIZE)).map((order: any, index: any) => (
               <tr key={order._id || index}>
                 {selectedColumnsHeaders.map((header, i) => (
                   <Cell key={i} order={order} header={header} />
@@ -63,9 +58,9 @@ export default function DataTableContainer({
         >
           Previous
         </Button>
-        <p>{pageIndex / 20 + 1}</p>
+        <p>{pageIndex / 17 + 1}</p>
         <Button
-          disabled={orders.length < 20}
+          disabled={orders.length < 17}
           onClick={handleNextPage}
           variant={"ghost"}
         >

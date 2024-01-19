@@ -2,8 +2,9 @@ import React, { useEffect, useState } from "react";
 import { FileManagerSheet } from "../fileManager/sheet";
 import DataTableContainer from "../data-table";
 import { getAllFileData } from "@/services/files.service";
+import { SselectedColumnComboBox } from "../data-table/selectColumnsComboBox";
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 17;
 
 export default function OrdersContainer({
   uploadedFiles,
@@ -16,6 +17,14 @@ export default function OrdersContainer({
 }) {
   const [activeFile, setActiveFile] = useState<any>(null);
   const [pageIndex, setPageIndex] = useState<number>(0);
+  const orders = activeFile?.rows;
+
+  const orderData = orders ? orders[0].data || orders[0] : {};
+
+  const allColumnHeaders = Object.keys(orderData);
+  const [selectedColumnsHeaders, setSelectedColumnsHeaders] =
+    useState<string[]>(allColumnHeaders);
+
   const handleSetActiveFile = async (filename: any) => {
     if (uploadedFiles) {
       const fileData = uploadedFiles.find(
@@ -31,6 +40,9 @@ export default function OrdersContainer({
     }
   };
 
+  const handleTagsChange = (newOptions: string[]) => {
+    setSelectedColumnsHeaders(newOptions);
+  };
   const handleNextPage = () => {
     setPageIndex((prev) => prev + PAGE_SIZE);
   };
@@ -44,12 +56,19 @@ export default function OrdersContainer({
           <h1 className="font-semibold text-muted-foreground">
             {activeFile?.metadata?.originalname || "Orders"}
           </h1>
-          <FileManagerSheet
-            activeFile={activeFile}
-            handleSetActiveFile={handleSetActiveFile}
-            filesMetaData={filesMetaData}
-            handleSetUploadedFiles={handleSetUploadedFiles}
-          />
+          <div className="flex items-center gap-2">
+            <SselectedColumnComboBox
+              selectedOptions={selectedColumnsHeaders}
+              onTagsChange={handleTagsChange}
+              options={allColumnHeaders}
+            />
+            <FileManagerSheet
+              activeFile={activeFile}
+              handleSetActiveFile={handleSetActiveFile}
+              filesMetaData={filesMetaData}
+              handleSetUploadedFiles={handleSetUploadedFiles}
+            />
+          </div>
         </section>
       </div>
       {activeFile && (
@@ -58,7 +77,8 @@ export default function OrdersContainer({
           PAGE_SIZE={PAGE_SIZE}
           pageIndex={pageIndex}
           handleNextPage={handleNextPage}
-          orders={activeFile.rows.slice(pageIndex, pageIndex + PAGE_SIZE)}
+          selectedColumnsHeaders={selectedColumnsHeaders}
+          orders={activeFile.rows}
         />
       )}
     </div>

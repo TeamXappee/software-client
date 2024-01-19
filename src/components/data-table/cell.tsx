@@ -9,8 +9,9 @@ export default function Cell({ order, header }: { order: any; header: any }) {
         type="text"
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        className={`p-2 bg-transparent w-full focus:outline-none focus:bg-input ${
-          value.length > 14 && "min-w-[250px]"
+        className={` ease-in-out duration-300 p-2 bg-transparent w-full focus:outline-none focus:bg-input 
+         ${value.length > 14 && "min-w-[250px]"} ${
+          value.length < 14 && "min-w-[50px]"
         } ${value.length > 20 && "min-w-[350px]"}`}
       />
     </td>

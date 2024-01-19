@@ -7,7 +7,7 @@
     --background: hsl(0, 0%, 100%); /* White background */
     --layer: hsl(0, 0%, 100%); /* Dark background */
     --foreground: hsl(0, 0%, 0%); /* Dark gray text color */
-    
+
     --card: hsl(0 0% 100%);
     --card-foreground: hsl(20 14.3% 4.1%);
 
@@ -23,11 +23,10 @@
 
     --reverse-secondary: hsl(30, 4%, 9%);
     --reverse-secondary-foreground: hsl(60 9.1% 97.8%);
-  
+
     --muted: hsl(60 4.8% 85.9%);
     --muted-foreground: hsl(0, 1%, 31%);
-    --muted-hovered:rgb(199, 199, 199);
-
+    --muted-hovered: rgb(199, 199, 199);
 
     --reverse-muted: hsl(12 6.5% 15.1%);
     --reverse-muted-foreground: hsl(24 5.4% 63.9%);
@@ -45,7 +44,6 @@
     --radius: 0.5rem;
 
     --shadow: hsl(0, 0%, 75.3%);
-
   }
 
   .dark {
@@ -62,7 +60,6 @@
     --primary: hsl(0, 84%, 49%);
     --primary-foreground: hsl(60 9.1% 97.8%);
     --primary-hover: hsl(0, 85%, 45%);
-
 
     --secondary: hsl(30, 4%, 9%);
     --secondary-foreground: hsl(60 9.1% 97.8%);
@@ -88,8 +85,6 @@
     --ring: hsl(24 5.7% 82.9%);
 
     --shadow: hsl(0, 0%, 12.5%);
-
-
   }
 }
 
@@ -103,24 +98,27 @@
     --container-height: calc(100vh - var(--header-height));
   }
 
+  .hide-scrollbar::-webkit-scrollbar {
+    height: 0px;
+    width: 0;
+    display: none;
+  }
   .pretty-scrollbar::-webkit-scrollbar {
     height: 6px;
   }
-  
+
   /* Track */
   .pretty-scrollbar::-webkit-scrollbar-track {
     background: hsl(var(--background));
     border-radius: 0 1.5rem 1.5rem 0;
     margin-top: 2px;
-  
   }
-  
+
   /* Handle */
   .pretty-scrollbar::-webkit-scrollbar-thumb {
     background: #8d8d8d;
-  
   }
-  
+
   /* Handle on hover */
   .pretty-scrollbar::-webkit-scrollbar-thumb:hover {
     background: #555;
