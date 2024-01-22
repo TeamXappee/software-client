@@ -1,30 +1,36 @@
-import { File, Group, UploadCloud } from "lucide-react";
+import { File, Group, Loader2, UploadCloud } from "lucide-react";
 import React, { useEffect } from "react";
 import { Input } from "../ui/input";
 import { useSession } from "next-auth/react";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
+import PageTitle from "../shared/pageTitle";
 
 export default function GroupMetadata({
   files,
   handleSetGroupMetadata,
   groupMetadata,
+  uploadingFilesState,
 }: {
   files: File[];
   handleSetGroupMetadata: (key: any, metadata: any) => void;
   groupMetadata: any;
+  uploadingFilesState: string;
 }) {
   const session = useSession();
   const user = session.data?.user;
+
+  const buttonDisabled =
+    files.length === 0 || uploadingFilesState === "loading";
 
   useEffect(() => {
     handleSetGroupMetadata("user_email", user?.email);
   }, [user]);
   return (
     <div className="bg-secondary w-1/2 p-8 rounded-2xl">
-      <h1 className="text-lg font-semibold  text-secondary-foreground flex items-center gap-2">
+      <PageTitle>
         Group Metadata <Group size={20} />
-      </h1>
+      </PageTitle>
       <div className="mt-2 py-2 min-h-[240px] flex justify-between gap-8 ">
         <section className="space-y-4 w-1/2 ">
           <Input
@@ -79,11 +85,17 @@ export default function GroupMetadata({
           </div>
           <div className="p-4 w-full flex justify-end items-center relative">
             <Button
+              disabled={buttonDisabled}
               type="submit"
               variant={"outline"}
               className="gap-2  w-h-12 bg-secondary border-muted-foreground/30 hover:bg-primary"
             >
-              Upload <UploadCloud size={20} />
+              Upload{" "}
+              {uploadingFilesState === "loading" ? (
+                <Loader2 size={20} className="animate-spin" />
+              ) : (
+                <UploadCloud size={20} />
+              )}
             </Button>
           </div>
         </section>

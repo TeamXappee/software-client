@@ -1,4 +1,5 @@
 "use client";
+import PageTitle from "@/components/shared/pageTitle";
 import FileForm from "@/components/upload/fileForm";
 import GroupMetadata from "@/components/upload/groupMetadata";
 import UploadedFileList from "@/components/upload/uploadedFileList";
@@ -13,7 +14,6 @@ export default function Upload() {
     client: "",
     notes: "",
     user_email: "",
-    data: [],
   });
 
   const handleSetGroupMetadata = (key: any, metadata: any) => {
@@ -68,17 +68,22 @@ export default function Upload() {
 
   return (
     <div className="p-6">
-      <h1 className="text-lg font-semibold  text-secondary-foreground flex items-center gap-2">
+      <PageTitle>
         Upload New Files <UploadCloud size={20} />
-      </h1>
+      </PageTitle>
       <div className="grid  space-y-4">
         <UploadedFileList
           files={uploadedFiles}
           handleRemoveFile={handleRemoveFile}
         />
         <hr />
-        <form encType="multipart/form-data" onSubmit={handleSubmitFiles} id="files">
+        <form
+          encType="multipart/form-data"
+          onSubmit={handleSubmitFiles}
+          id="files"
+        >
           <GroupMetadata
+            uploadingFilesState={uploadingFilesState}
             groupMetadata={groupMetadata}
             handleSetGroupMetadata={handleSetGroupMetadata}
             files={uploadedFiles}
