@@ -1,15 +1,16 @@
 "use client";
 import PageTitle from "@/components/shared/pageTitle";
+import SKRecentlyUploadedFile from "@/components/skeletons/SKrecentlyUploadedFile";
 import FileForm from "@/components/upload/fileForm";
 import GroupMetadata from "@/components/upload/groupMetadata";
+import RecentlyUploadedFiles from "@/components/upload/recentlyUploadedFiles";
 import UploadedFileList from "@/components/upload/uploadedFileList";
 import { UploadCloud } from "lucide-react";
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, Suspense, useState } from "react";
 
 export default function Upload() {
-  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
-  const [uploadingFilesState, setUploadingFilesState] =
-    useState<string>("idle");
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [uploadingFileState, setUploadingFileState] = useState<string>("idle");
   const [groupMetadata, setGroupMetadata] = useState<any>({
     client: "",
     notes: "",
@@ -25,71 +26,79 @@ export default function Upload() {
   };
 
   const handleRemoveFile = (file: any) => {
-    if (!uploadedFiles) return;
-    document.getElementById(file.name)?.classList.add("animate-vanish");
-
-    setTimeout(() => {
-      setUploadedFiles(uploadedFiles.filter((f: any) => f.name !== file.name));
-    }, 550);
+    setUploadedFile(null);
   };
 
   const handleStagingfiles = (e: ChangeEvent<HTMLInputElement>) => {
-    const newfilesArray = Array.from(e.target.files || []);
-    setUploadedFiles(
-      uploadedFiles ? [...uploadedFiles, ...newfilesArray] : newfilesArray
-    );
+    if (!e.target.files) return;
+    setUploadedFile(e.target.files[0]);
     const form = document.getElementById("files") as HTMLFormElement;
     form.reset();
   };
 
   const handleSubmitFiles = async (e: any) => {
     e.preventDefault();
-    setUploadingFilesState("loading");
+    setUploadingFileState("loading");
 
-    const formData = new FormData();
-    uploadedFiles.forEach((file) => {
-      formData.append("files", file); // Append each file to the form data
-    });
-    formData.append("metadata", JSON.stringify(groupMetadata)); // Append metadata as a JSON string
+    try {
+      if (!uploadedFile) return;
+      const formData = new FormData();
+      formData.append("files", uploadedFile); // Append each file to the form data
+      formData.append(
+        "metadata",
+        JSON.stringify({
+          fileName: uploadedFile.name,
+          size: uploadedFile.size,
+          ...groupMetadata,
+        })
+      ); // Append metadata as a JSON string
+      const response = await fetch("http://localhost:8000/api/file/upload", {
+        method: "POST",
+        body: formData, // Send the form data
+      });
 
-    const response = await fetch("http://localhost:8000/api/files/upload", {
-      method: "POST",
-      body: formData, // Send the form data
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      const files = JSON.parse(data.data);
-      //   handleSetUploadedFiles(files);
-      setUploadedFiles([]);
-      setUploadingFilesState("success");
+      if (response.ok) {
+        const data = await response.json();
+        const files = JSON.parse(data.data);
+        //   handleSetUploadedFiles(files);
+        setUploadedFile(null);
+        setUploadingFileState("success");
+      }
+    } catch (err) {
+      console.log(err);
+      setUploadingFileState("failed");
+    } finally {
+      setUploadingFileState("idle");
     }
   };
 
   return (
-    <div className="p-6">
+    <div className="p-6 ">
       <PageTitle>
-        Upload New Files <UploadCloud size={20} />
+        Upload New Files <UploadCloud size={20} />{" "}
+        <span className="text-sm text-muted-foreground font-normal">{`(upload 1 file at a time)`}</span>
       </PageTitle>
-      <div className="grid  space-y-4">
-        <UploadedFileList
-          files={uploadedFiles}
-          handleRemoveFile={handleRemoveFile}
-        />
-        <hr />
+      <UploadedFileList
+        file={uploadedFile}
+        handleRemoveFile={handleRemoveFile}
+      />
+      <hr className="my-4" />
+      <div className="flex gap-4">
         <form
           encType="multipart/form-data"
           onSubmit={handleSubmitFiles}
           id="files"
+          className="w-full"
         >
           <GroupMetadata
-            uploadingFilesState={uploadingFilesState}
+            handleStagingfiles={handleStagingfiles}
+            uploadingFileState={uploadingFileState}
             groupMetadata={groupMetadata}
             handleSetGroupMetadata={handleSetGroupMetadata}
-            files={uploadedFiles}
+            file={uploadedFile}
           />
-          <FileForm handleStagingfiles={handleStagingfiles} />
         </form>
+          <RecentlyUploadedFiles uploadingFileState={uploadingFileState} />
       </div>
     </div>
   );

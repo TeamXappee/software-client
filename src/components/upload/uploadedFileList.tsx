@@ -2,19 +2,23 @@ import React from "react";
 import FileCard from "./fileCard";
 
 export default function UploadedFileList({
-  files,
+  file,
   handleRemoveFile,
 }: {
-  files: File[];
+  file: File|null;
   handleRemoveFile: (file: File) => void;
 }) {
   return (
     <div className="mt-4 ">
-      {files && files.length > 0 ? (
+      {file ? (
         <div className="flex flex-wrap gap-2">
-          {files.map((file: any) => (
-            <FileCard size="lg" handleRemoveFile={handleRemoveFile} file={file} />
-          ))}
+          {
+            <FileCard
+              size="lg"
+              handleRemoveFile={handleRemoveFile}
+              file={file}
+            />
+          }
         </div>
       ) : (
         <p className="text-muted-foreground">

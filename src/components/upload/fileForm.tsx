@@ -1,5 +1,6 @@
-import { Plus } from "lucide-react";
+import { Plus, PlusCircle } from "lucide-react";
 import React from "react";
+import { Button } from "../ui/button";
 
 export default function FileForm({
   handleStagingfiles,
@@ -7,10 +8,11 @@ export default function FileForm({
   handleStagingfiles: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
-    <div className="absolute bottom-0 right-0 m-6 ">
-      <button
+    <div className=" ">
+      <Button
         type="button"
-        className="relative bg-primary hover:bg-primary-hover hover:scale-110 ease-in-out duration-150 cursor-default  p-4 rounded-3xl text-lg font-bold"
+        variant={"secondary"}
+        className="relative bg-primary hover:bg-primary-hover hover:bg-red-800 gap-2 ease-in-out duration-150 cursor-default text-base font-medium rounded-sm"
       >
         <input
           id="upload-files-input"
@@ -21,10 +23,8 @@ export default function FileForm({
           name="files"
           className="absolute w-full h-full rounded-3xl opacity-0  left-0 top-0  cursor-default"
         />
-        <span className="flex gap-2 items-center w-full h-full">
-          <Plus strokeWidth={3} /> Add New
-        </span>
-      </button>
+        <PlusCircle strokeWidth={2} size={20} />New
+      </Button>
     </div>
   );
 }
