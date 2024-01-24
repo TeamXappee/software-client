@@ -9,7 +9,7 @@ export default async function OrderByClient({
   let orders;
   try {
     const res = await fetch(
-      `http://localhost:8000/api/file/all?client_id=${params.client_id}`,
+      `http://localhost:8000/api/file/all?client_id=${params.client_id}&pageIndex=0`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -26,11 +26,7 @@ export default async function OrderByClient({
   if (!orders) return null;
   return (
     <div className="-mt-4 ml-6">
-      <DataTableDemo dataa={orders} />
+      <DataTableDemo data={orders} totalCount={0} />
     </div>
   );
 }
-
-
-
-

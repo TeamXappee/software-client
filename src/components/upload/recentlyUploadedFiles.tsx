@@ -28,24 +28,26 @@ export default function RecentlyUploadedFiles({
       } catch (err: any) {
         console.log(err);
         setLoading(false);
+      } finally {
+        setLoading(false);
       }
     }
     fetchAllFiles();
   }, [uploadingFileState]);
   return (
-    <div className="border border-input p-6 rounded-xl w-2/3 overflow-y-auto">
-      <p className="font-bold text-lg flex items-center gap-2 mb-6">
-        Recent Files <Files size={20} />
+    <div>
+      <p className="font-bold text-lg flex items-center gap-2 mb-2">
+        Recent Files By You <Files size={17} />
       </p>
 
       {recentFiles && recentFiles.length > 0 ? (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 overflow-x-auto">
           {recentFiles.map((file: any) => (
             <FileCard size="lg" file={file} />
           ))}
         </div>
       ) : loading ? (
-        <div className="w-full h-[85%] grid place-content-center">
+        <div className="w-full h-16 grid place-content-center">
           <Loader2 className="animate-spin" />
         </div>
       ) : (

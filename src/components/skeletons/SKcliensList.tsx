@@ -8,7 +8,7 @@ export default function SKCliensList() {
         .map((_, i) => (
           <div
             key={i}
-            className="w-[14rem] h-24 p-6 bg-input  rounded-lg animate-pulse"
+            className="w-full h-[5.3rem] p-6 bg-input  rounded-lg animate-pulse"
           ></div>
         ))}
     </div>

@@ -13,7 +13,12 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react";
+import {
+  ArrowUpDown,
+  ChevronDown,
+  MoreHorizontal,
+  Newspaper,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -53,7 +58,12 @@ function generateColumnDefs(data: any[]): ColumnDef<TOrderDetails>[] {
           <div className="absolute -top-10 right-0 p-2 hidden group-hover:inline-flex bg-input rounded-lg ease-in-out duration-75">
             ID: {row.getValue("ORDER_ID")} | {row.getValue("CHANNEL_NAME")}
           </div>
-          <span contentEditable className="p-2 focus:outline-none focus:border-b border-foreground/50 ">{value}</span>
+          <span
+            contentEditable
+            className="p-2 focus:outline-none focus:border-b border-foreground/50 "
+          >
+            {value}
+          </span>
         </div>
       );
     },
@@ -111,7 +121,15 @@ function generateColumnDefs(data: any[]): ColumnDef<TOrderDetails>[] {
 //   },
 // ];
 
-export function DataTableDemo({ dataa }: { dataa: any }) {
+export function DataTableDemo({
+  data,
+  totalCount,
+  fileId,
+}: {
+  data: any;
+  totalCount: number;
+  fileId?: string;
+}) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -120,9 +138,37 @@ export function DataTableDemo({ dataa }: { dataa: any }) {
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
+  const PAGE_SIZE = 10;
+  const [tableData, setTableData] = React.useState(data);
+  const [pageIndex, setPageIndex] = React.useState(0);
+
+  const handleFetchMore = async () => {
+    const nextPageIndex = pageIndex + 1; // Calculate next page index
+
+    console.log(nextPageIndex, tableData.length);
+    // Check if the next page data has already been fetched
+    if (nextPageIndex * PAGE_SIZE < tableData.length) {
+      setPageIndex(nextPageIndex);
+      return;
+    }
+
+    const res = await fetch(
+      `http://localhost:8000/api/orders/all?file_id=${fileId}&pageIndex=${nextPageIndex}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
+      }
+    );
+
+    const newData = await res.json();
+    setTableData((prevData: any) => [...prevData, ...newData.orders]); // Append new data
+    setPageIndex(newData.currentPageIndex); // Update pageIndex from the response
+  };
   const table = useReactTable({
-    data: dataa,
-    columns: generateColumnDefs(dataa),
+    data: tableData,
+    columns: generateColumnDefs(tableData),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -224,10 +270,9 @@ export function DataTableDemo({ dataa }: { dataa: any }) {
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          {pageIndex + 1} from {Math.ceil(totalCount / PAGE_SIZE)} page(s).
         </div>
-        <div className="space-x-2">
+        <div className="space-x-2  relative right-4">
           <Button
             variant="outline"
             size="sm"
@@ -239,8 +284,14 @@ export function DataTableDemo({ dataa }: { dataa: any }) {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
+            onClick={() => {
+              table.nextPage();
+              handleFetchMore();
+            }}
+            disabled={
+              !table.getCanNextPage() &&
+              pageIndex + 1 >= Math.ceil(totalCount / PAGE_SIZE)
+            }
           >
             Next
           </Button>

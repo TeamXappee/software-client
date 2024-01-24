@@ -51,15 +51,16 @@ export default function SelectClient({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          variant={"outline"}
           role="combobox"
           aria-expanded={open}
-          className="w-[200px] justify-between bg-background hover:bg-background  "
+          className="w-full justify-between"
         >
           {value ? value : "Select client..."}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
+      <PopoverContent align="end" className="w-[200px] p-0 max-h-[40vh] overflow-y-auto">
         <Command>
           <CommandInput placeholder="Search framework..." />
           <CommandEmpty>No framework found.</CommandEmpty>

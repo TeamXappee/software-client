@@ -1,11 +1,7 @@
 "use client";
-import PageTitle from "@/components/shared/pageTitle";
-import SKRecentlyUploadedFile from "@/components/skeletons/SKrecentlyUploadedFile";
-import FileForm from "@/components/upload/fileForm";
 import GroupMetadata from "@/components/upload/groupMetadata";
 import RecentlyUploadedFiles from "@/components/upload/recentlyUploadedFiles";
 import UploadedFileList from "@/components/upload/uploadedFileList";
-import { UploadCloud } from "lucide-react";
 import { ChangeEvent, Suspense, useState } from "react";
 
 export default function Upload() {
@@ -60,7 +56,7 @@ export default function Upload() {
       if (response.ok) {
         const data = await response.json();
         const result = JSON.parse(data.data);
-        console.log(result)
+        console.log(result);
         //   handleSetUploadedFiles(files);
         setUploadedFile(null);
         setUploadingFileState("success");
@@ -74,33 +70,27 @@ export default function Upload() {
   };
 
   return (
-    <div className="p-6 ">
-      <PageTitle>
-        Upload New Files <UploadCloud size={20} />{" "}
-        <span className="text-sm text-muted-foreground font-normal">{`(upload 1 file at a time)`}</span>
-      </PageTitle>
+    <div className="px-6 space-y-6">
+      <RecentlyUploadedFiles uploadingFileState={uploadingFileState} />
+      <hr />
       <UploadedFileList
         file={uploadedFile}
         handleRemoveFile={handleRemoveFile}
       />
-      <hr className="my-4" />
-      <div className="flex gap-4">
-        <form
-          encType="multipart/form-data"
-          onSubmit={handleSubmitFiles}
-          id="files"
-          className="w-full"
-        >
-          <GroupMetadata
-            handleStagingfiles={handleStagingfiles}
-            uploadingFileState={uploadingFileState}
-            groupMetadata={groupMetadata}
-            handleSetGroupMetadata={handleSetGroupMetadata}
-            file={uploadedFile}
-          />
-        </form>
-        <RecentlyUploadedFiles uploadingFileState={uploadingFileState} />
-      </div>
+      <hr />
+      <form
+        encType="multipart/form-data"
+        onSubmit={handleSubmitFiles}
+        id="files"
+      >
+        <GroupMetadata
+          handleStagingfiles={handleStagingfiles}
+          uploadingFileState={uploadingFileState}
+          groupMetadata={groupMetadata}
+          handleSetGroupMetadata={handleSetGroupMetadata}
+          file={uploadedFile}
+        />
+      </form>
     </div>
   );
 }

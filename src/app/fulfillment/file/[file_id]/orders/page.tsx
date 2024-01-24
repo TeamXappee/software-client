@@ -7,9 +7,10 @@ export default async function FullfillmentOrders({
   params: { file_id: string };
 }) {
   let orders;
+  let totalCount
   try {
     const res = await fetch(
-      `http://localhost:8000/api/orders/all?file_id=${params.file_id}`,
+      `http://localhost:8000/api/orders/all?file_id=${params.file_id}&pageIndex=0`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -20,12 +21,13 @@ export default async function FullfillmentOrders({
 
     const data = await res.json();
     orders = data.orders;
+    totalCount = data.totalCount
   } catch (err: any) {
     console.log("err", err.message);
   }
   return (
-    <div className="-mt-4 ml-6">
-      <DataTableDemo dataa={orders} />
+    <div className=" ml-6">
+      <DataTableDemo fileId={params.file_id} data={orders}  totalCount={totalCount}/>
     </div>
   );
 }
