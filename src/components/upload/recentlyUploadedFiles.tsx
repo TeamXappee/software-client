@@ -20,7 +20,7 @@ export default function RecentlyUploadedFiles({
         if (!user?.email) return;
         setLoading(true);
         const res = await fetch(
-          `http://localhost:8000/api/file/all/${user?.email}`
+          `http://localhost:8000/api/file/all?user_email=${user?.email}`
         );
         const data = await res.json();
         setLoading(false);

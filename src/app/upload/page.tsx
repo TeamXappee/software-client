@@ -12,7 +12,7 @@ export default function Upload() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [uploadingFileState, setUploadingFileState] = useState<string>("idle");
   const [groupMetadata, setGroupMetadata] = useState<any>({
-    client: "",
+    client_id: "",
     notes: "",
     user_email: "",
   });
@@ -43,7 +43,7 @@ export default function Upload() {
     try {
       if (!uploadedFile) return;
       const formData = new FormData();
-      formData.append("files", uploadedFile); // Append each file to the form data
+      formData.append("file", uploadedFile); // Append each file to the form data
       formData.append(
         "metadata",
         JSON.stringify({
@@ -59,7 +59,8 @@ export default function Upload() {
 
       if (response.ok) {
         const data = await response.json();
-        const files = JSON.parse(data.data);
+        const result = JSON.parse(data.data);
+        console.log(result)
         //   handleSetUploadedFiles(files);
         setUploadedFile(null);
         setUploadingFileState("success");
@@ -98,7 +99,7 @@ export default function Upload() {
             file={uploadedFile}
           />
         </form>
-          <RecentlyUploadedFiles uploadingFileState={uploadingFileState} />
+        <RecentlyUploadedFiles uploadingFileState={uploadingFileState} />
       </div>
     </div>
   );

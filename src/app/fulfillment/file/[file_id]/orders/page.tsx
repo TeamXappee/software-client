@@ -9,11 +9,11 @@ export default async function FullfillmentOrders({
   let orders;
   try {
     const res = await fetch(
-      `http://localhost:8000/api/orders/all/${params.file_id}`,
+      `http://localhost:8000/api/orders/all?file_id=${params.file_id}`,
       {
         headers: {
-            'Content-Type': 'application/json'
-          },
+          "Content-Type": "application/json",
+        },
         cache: "no-store",
       }
     );
@@ -21,11 +21,11 @@ export default async function FullfillmentOrders({
     const data = await res.json();
     orders = data.orders;
   } catch (err: any) {
-    console.log("err",err.message);
+    console.log("err", err.message);
   }
   return (
     <div className="-mt-4 ml-6">
-      <DataTableDemo dataa={orders}/>
+      <DataTableDemo dataa={orders} />
     </div>
   );
 }

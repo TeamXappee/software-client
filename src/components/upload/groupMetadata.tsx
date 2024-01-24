@@ -6,6 +6,7 @@ import { Label } from "../ui/label";
 import { Button } from "../ui/button";
 import PageTitle from "../shared/pageTitle";
 import FileForm from "./fileForm";
+import SelectClient from "./selectClient";
 
 export default function GroupMetadata({
   file,
@@ -38,13 +39,8 @@ export default function GroupMetadata({
 
       <div className="mt-2 py-2 min-h-[240px] flex justify-between gap-8 ">
         <section className="space-y-4 w-1/2 ">
-          <Input
-            name="client"
-            onChange={(e) => handleSetGroupMetadata("client", e.target.value)}
-            value={groupMetadata.client}
-            placeholder="Client Name*"
-            className=" "
-            required
+          <SelectClient
+            handleSetGroupMetadata={handleSetGroupMetadata}
           />
           <textarea
             name="notes"

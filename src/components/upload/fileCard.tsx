@@ -32,7 +32,7 @@ export default function FileCard({
       {file?.fileName && (
         <Link
           className="opacity-0 group-hover:opacity-100 hover:bg-background rounded-full p-1"
-          href={`/fulfillment/${file._id}/orders`}
+          href={`/fulfillment/file/${file._id}/orders`}
         >
           <ArrowRight size={20} />
         </Link>
