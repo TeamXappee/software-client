@@ -13,7 +13,6 @@ import { UserAvatar } from "./userAvatar";
 import { UserData } from "../../../../auth";
 import { ArrowRight, Check } from "lucide-react";
 import { signOut } from "next-auth/react";
-import { BlogStagingSheet } from "@/components/BlockEditor/components/blogStaging";
 
 export function WriterDropdownAvatarMenu({ user }: { user: UserData }) {
   const [sheetOpen, setSheetOpen] = React.useState(false);
@@ -23,7 +22,6 @@ export function WriterDropdownAvatarMenu({ user }: { user: UserData }) {
 
   return (
     <>
-      <BlogStagingSheet open={sheetOpen} toggleSheetOpen={toggleSheetOpen} />
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <button>

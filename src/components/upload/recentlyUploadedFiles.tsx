@@ -43,7 +43,7 @@ export default function RecentlyUploadedFiles({
       {recentFiles && recentFiles.length > 0 ? (
         <div className="flex flex-wrap gap-2 overflow-x-auto">
           {recentFiles.map((file: any) => (
-            <FileCard size="lg" file={file} />
+            <FileCard key={file._id} size="lg" file={file} />
           ))}
         </div>
       ) : loading ? (

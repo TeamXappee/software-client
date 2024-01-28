@@ -31,7 +31,7 @@ export default async function OrderByClient({
       <PageTitle>Files Uploaded</PageTitle>
       <div className="flex flex-wrap gap-4">
         {files.map((file: any) => (
-          <FileCard file={file} size="lg" />
+          <FileCard key={file._id} file={file} size="lg" />
         ))}
       </div>
     </div>

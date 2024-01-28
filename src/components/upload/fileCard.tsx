@@ -34,7 +34,9 @@ export default function FileCard({
       {file?.fileName && (
         <Link
           className="opacity-0 group-hover:opacity-100 hover:bg-background rounded-full p-1"
-          href={`/fulfillment/file/${file._id}/orders`}
+          href={`/fulfillment/file/${file._id}/orders?sheets=${file.sheets.join(
+            ","
+          )}&activeSheet=DETAILS`}
         >
           <ArrowRight size={15} />
         </Link>

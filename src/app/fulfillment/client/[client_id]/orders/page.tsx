@@ -1,4 +1,5 @@
 import { DataTableDemo } from "@/components/dataTable/table";
+import TableContainer from "@/components/dataTable/tableContainer";
 import React from "react";
 
 export default async function OrderByClient({
@@ -26,7 +27,6 @@ export default async function OrderByClient({
   if (!orders) return null;
   return (
     <div className="-mt-4 ml-6">
-      <DataTableDemo data={orders} totalCount={0} />
     </div>
   );
 }

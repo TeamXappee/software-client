@@ -1,5 +1,4 @@
 "use client";
-import { Btn } from "@/components/ui/btn";
 import { Loader2Icon } from "lucide-react";
 import { signIn } from "next-auth/react";
 import Image from "next/image";

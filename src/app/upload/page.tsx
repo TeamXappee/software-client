@@ -51,6 +51,7 @@ export default function Upload() {
       const response = await fetch("http://localhost:8000/api/file/upload", {
         method: "POST",
         body: formData, // Send the form data
+        cache: "no-store",
       });
 
       if (response.ok) {

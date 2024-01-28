@@ -1,4 +1,3 @@
-import LayoutHeader from "@/components/header";
 import Logo from "@/components/shared/logo";
 import ThemeTogglerBtn from "@/components/shared/theme/togglerBtn";
 
