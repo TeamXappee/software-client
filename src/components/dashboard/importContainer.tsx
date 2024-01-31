@@ -5,11 +5,13 @@ import PageTitle from "@/components/shared/pageTitle";
 import { Button } from "../ui/button";
 import { SelectChannel } from "./selectChannel";
 import { IChannel } from "@/types/channel";
-import { DownloadCloud, Loader2 } from "lucide-react";
+import { DownloadCloud } from "lucide-react";
 import { DateRangePciker } from "./dateRangePicker";
 import { useRenderToast } from "@/hooks/useRenderToast";
 import { fetchOrders } from "@/api/orders";
 import Spinner from "../ui/custom/spinner";
+import OrderList from "../orders/orderList";
+import { toast } from "sonner";
 
 interface ImportContainerProps {
   channels: IChannel[];
@@ -24,49 +26,50 @@ export default function ImportContainer({ channels }: ImportContainerProps) {
     "idle" | "loading" | "success" | "fail"
   >("idle");
 
-  console.log(orders)
-  const handleImportOrders = async () => {
-    if (
-      importingStatus === "loading" ||
-      !dateRange ||
-      !dateRange.from ||
-      !dateRange.to
-    )
-      return;
 
-    setImportingStatus("loading");
-    useRenderToast("Loading...", "loading");
-
-    try {
-      const response = await fetchOrders(
-        dateRange.from,
-        dateRange.to,
-        selectedChannelIds
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setOrders(data.orders);
-
-        if (ordersLength > 0) {
-          useRenderToast(
-            `${ordersLength} Orders imported successfully.`,
-            "success"
-          );
+  const handleImportOrders = () => {
+    // Define the promise function within the handleImportOrders function
+    const importOrdersPromise = () =>
+      new Promise(async (resolve, reject) => {
+        if (
+          importingStatus === "loading" ||
+          !dateRange ||
+          !dateRange.from ||
+          !dateRange.to
+        ) {
+          reject("Invalid import conditions");
+          return;
         }
-        if (data.duplicateCount) {
-          useRenderToast(
-            `${data.duplicateCount} Orders were already imported.`,
-            "error"
+
+        setImportingStatus("loading");
+        try {
+          const response = await fetchOrders(
+            dateRange.from,
+            dateRange.to,
+            selectedChannelIds
           );
+          if (response.ok) {
+            const data = await response.json();
+            setOrders(data.orders);
+            resolve(data.orders);
+          } else {
+            throw new Error("Failed to import orders");
+          }
+        } catch (err) {
+          console.log(err);
+          reject(err);
+        } finally {
+          setImportingStatus("idle");
         }
-      } else {
-        throw new Error("Failed to import orders");
-      }
-    } catch (err) {
-      useRenderToast("Something went wrong", "error");
-    } finally {
-      setImportingStatus("idle");
-    }
+      });
+
+    toast.promise(importOrdersPromise, {
+      loading: "Loading...",
+      success: (orders: any) => {
+        return `Imported ${orders.length} orders successfully!`;
+      },
+      error: "Error importing orders",
+    });
   };
 
   return (
@@ -93,7 +96,7 @@ export default function ImportContainer({ channels }: ImportContainerProps) {
               disabled={importingStatus === "loading"}
               className="gap-2 font-semibold"
             >
-              Import{" "}
+              Import
               {importingStatus === "loading" ? (
                 <Spinner />
               ) : (
@@ -104,29 +107,7 @@ export default function ImportContainer({ channels }: ImportContainerProps) {
         </section>
       </div>
       <hr />
-      <div>
-        <h2 className="font-medium text-lg py-4">Orders</h2>
-        <div className="grid grid-cols-5 gap-2">
-          {orders.map((order) => (
-            <div className="bg-secondary hover:bg-muted  overflow-x-auto pretty-scrollbar p-2 rounded-lg text-sm ">
-              <p>{new Date(order.date).toDateString()}</p>
-              <p className="font-bold">{order.selroChannelName}</p>
-              <p>{order.carrierName || "No Carrier"}</p>
-              <p className="text-xs text-muted-foreground">
-                {order.selroOrderId}
-              </p>
-              <p className="mt-1">
-                {order.trackingNumber || "No Tracking Number"}
-              </p>
-              <p>
-                {order.shippingMethod?.includes("|")
-                  ? order.shippingMethod.split("|")[1]
-                  : order.shippingMethod}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
+      <OrderList orders={orders} />
     </div>
   );
 }
