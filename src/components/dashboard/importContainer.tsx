@@ -1,31 +1,43 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DateRange } from "react-day-picker";
 import PageTitle from "@/components/shared/pageTitle";
 import { Button } from "../ui/button";
 import { SelectChannel } from "./selectChannel";
 import { IChannel } from "@/types/channel";
 import { DownloadCloud } from "lucide-react";
-import { DateRangePciker } from "./dateRangePicker";
-import { useRenderToast } from "@/hooks/useRenderToast";
+import { DateRangePicker } from "./dateRangePicker";
 import { fetchOrders } from "@/api/orders";
 import Spinner from "../ui/custom/spinner";
 import OrderList from "../orders/orderList";
 import { toast } from "sonner";
+import { useSearchParams } from "next/navigation";
 
 interface ImportContainerProps {
   channels: IChannel[];
 }
 
 export default function ImportContainer({ channels }: ImportContainerProps) {
+  const searchParams = useSearchParams();
+  const rangeString = searchParams.get("range");
+  const initialRange = rangeString ? JSON.parse(rangeString) : undefined;
+
   const [orders, setOrders] = useState<any[]>([]);
-  const ordersLength = orders.length;
-  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(
+    initialRange
+  );
   const [selectedChannelIds, setSelectedChannelIds] = useState<number[]>([]);
   const [importingStatus, setImportingStatus] = useState<
     "idle" | "loading" | "success" | "fail"
   >("idle");
+  const [page, setPage] = useState(1);
+  const pagesize = 20;
 
+  // useEffect(() => {
+  //   if (page > 1) {
+  //     handleImportOrders();
+  //   }
+  // }, [page, dateRange, selectedChannelIds]);
 
   const handleImportOrders = () => {
     // Define the promise function within the handleImportOrders function
@@ -46,7 +58,9 @@ export default function ImportContainer({ channels }: ImportContainerProps) {
           const response = await fetchOrders(
             dateRange.from,
             dateRange.to,
-            selectedChannelIds
+            selectedChannelIds,
+            page,
+            pagesize
           );
           if (response.ok) {
             const data = await response.json();
@@ -72,20 +86,41 @@ export default function ImportContainer({ channels }: ImportContainerProps) {
     });
   };
 
+  const calculateInvoice = async () => {
+    const res = await fetch(
+      "http://localhost:8000/api/orders/calculateInvoice",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: dateRange?.from,
+          to: dateRange?.to,
+          channelIds: selectedChannelIds,
+        }),
+      }
+    );
+    const data = await res.json();
+    console.log(data.processedOrders || "no");
+  };
   return (
-    <div className="p-4 ">
+    <div className="p-4">
       <div className="flex justify-between min-h-[175px]">
         <section>
           <PageTitle>Import new orders</PageTitle>
           <p className="text-muted-foreground text-sm">
-            {ordersLength > 0
-              ? `${ordersLength} orders imported.`
-              : `No orders imported.`}
+            {orders.length > 0
+              ? `${orders.length} orders imported.`
+              : "No orders imported."}
           </p>
         </section>
         <section>
           <div className="flex flex-col items-end gap-2">
-            <DateRangePciker handleDateChange={setDateRange} />
+            <DateRangePicker
+              dateRange={dateRange}
+              handleDateChange={setDateRange}
+            />
             <SelectChannel
               selectedChannelIds={selectedChannelIds}
               setSelectedChannelIds={setSelectedChannelIds}
@@ -106,8 +141,7 @@ export default function ImportContainer({ channels }: ImportContainerProps) {
           </div>
         </section>
       </div>
-      <hr />
-      <OrderList orders={orders} />
+      <OrderList page={page} setPage={setPage} orders={orders} />
     </div>
   );
 }

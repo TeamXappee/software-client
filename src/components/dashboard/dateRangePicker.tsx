@@ -13,18 +13,28 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-export function DateRangePciker({
+export function DateRangePicker({
   className,
   handleDateChange,
+  dateRange,
 }: React.HTMLAttributes<HTMLDivElement> & {
   handleDateChange: (date: DateRange | undefined) => void;
+  dateRange: DateRange | undefined;
 }) {
-  const [date, setDate] = React.useState<DateRange | undefined>(undefined);
+  const [date, setDate] = React.useState<DateRange | undefined>(dateRange);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
 
   React.useEffect(() => {
     handleDateChange(date);
+    const params = new URLSearchParams(searchParams);
+    params.set("range", JSON.stringify(date));
+    router.replace(`${pathname}?${params.toString()}`);
   }, [date]);
+
   return (
     <div className={cn("grid gap-2", className)}>
       <Popover>

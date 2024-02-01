@@ -34,37 +34,47 @@ export type TOrderData = {
   WEIGHT_KG: number;
 };
 
-export type TOrderKeys = 
-  'BUYER_EMAIL' |
-  'BUYER_NAME' |
-  'CHANNEL' |
-  'CHANNEL_NAME' |
-  'CURRENCY_CODE' |
-  'EAN' |
-  'ITEM_PRICE' |
-  'ITEM_TAX' |
-  'ORDER_DATE' |
-  'ORDER_ID' |
-  'ORDER_ITEM_ID' |
-  'ORDER_STATUS' |
-  'ORDER_TOTAL' |
-  'PAYMENT_STATUS' |
-  'QUANTITY_PURCHASED' |
-  'SELRO_ORDER_ID' |
-  'SHIPPING_CARRIER' |
-  'SHIPPING_COST' |
-  'SHIPPING_METHOD' |
-  'SHIP_ADDRESS_1' |
-  'SHIP_ADDRESS_2' |
-  'SHIP_CITY' |
-  'SHIP_COUNTRY' |
-  'SHIP_COUNTRY_CODE' |
-  'SHIP_POSTALCODE' |
-  'SHIP_STATE' |
-  'SITE' |
-  'SKU' |
-  'SUB_TOTAL' |
-  'TITLE' |
-  'TOTAL_PRICE' |
-  'UPC' |
-  'WEIGHT_KG';
+export type TOrderKeys =
+  | "BUYER_EMAIL"
+  | "BUYER_NAME"
+  | "CHANNEL"
+  | "CHANNEL_NAME"
+  | "CURRENCY_CODE"
+  | "EAN"
+  | "ITEM_PRICE"
+  | "ITEM_TAX"
+  | "ORDER_DATE"
+  | "ORDER_ID"
+  | "ORDER_ITEM_ID"
+  | "ORDER_STATUS"
+  | "ORDER_TOTAL"
+  | "PAYMENT_STATUS"
+  | "QUANTITY_PURCHASED"
+  | "SELRO_ORDER_ID"
+  | "SHIPPING_CARRIER"
+  | "SHIPPING_COST"
+  | "SHIPPING_METHOD"
+  | "SHIP_ADDRESS_1"
+  | "SHIP_ADDRESS_2"
+  | "SHIP_CITY"
+  | "SHIP_COUNTRY"
+  | "SHIP_COUNTRY_CODE"
+  | "SHIP_POSTALCODE"
+  | "SHIP_STATE"
+  | "SITE"
+  | "SKU"
+  | "SUB_TOTAL"
+  | "TITLE"
+  | "TOTAL_PRICE"
+  | "UPC"
+  | "WEIGHT_KG";
+
+export interface IOrderTypes {
+  pending: number;
+  shipped: number;
+  unshipped: number;
+  cancelled: number;
+  missing_weight: number;
+  missing_carrier: number;
+  missing_service: number;
+}

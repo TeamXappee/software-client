@@ -1,18 +1,23 @@
 import { format } from "date-fns";
+import { cache } from "react";
 
-export const fetchOrders = async (
-  fromDate: Date,
-  toDate: Date,
-  channelIds: number[]
-) => {
-  const from = format(fromDate, "yyyy-MM-dd");
-  const to = format(toDate, "yyyy-MM-dd");
+export const fetchOrders = cache(
+  async (
+    fromDate: Date,
+    toDate: Date,
+    channelIds: number[],
+    page: number,
+    pagesize: number
+  ) => {
+    const from = format(fromDate, "yyyy-MM-dd");
+    const to = format(toDate, "yyyy-MM-dd");
 
-  return fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/orders/import`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ from, to, channelIds }),
-  });
-};
+    return await fetch(`${process.env.NEXT_PUBLIC_SERVER_URL}/orders/import`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ from, to, channelIds, page, pagesize }),
+    });
+  }
+);

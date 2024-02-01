@@ -12,7 +12,7 @@ export default async function Header() {
   const session = await getCurrentSession();
   return (
     <div className="h-[var(--header-height)] ">
-      <div className="fixed w-full h-[var(--header-height)] bg-background z-50 border-b border-input px-4 py-2 flex justify-between items-center ">
+      <div className=" w-full h-[var(--header-height)] bg-background z-50 border-b border-input px-4 py-2 flex justify-between items-center ">
         <div className="flex gap-4">
           <Link href="/">
             <Image

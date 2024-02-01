@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import React from "react";
+import React, { SetStateAction, useEffect, useRef } from "react";
 import { ChannelLogo, ServiceTitle, ShippedStatus } from "./customFields";
 import { Dot } from "lucide-react";
 import OrderItemList from "./orderItemList";
@@ -8,10 +8,46 @@ import Warning from "../ui/custom/warning";
 export default function OrderCard({
   order,
   setWarnings,
+  index,
+  page,
+  setPage,
+  length,
 }: {
   order: any;
   setWarnings: React.Dispatch<any>;
+  index: number;
+  page: number;
+  setPage: any;
+  length: number;
 }) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const currentElement = ref.current;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && index === length - 5) {
+          setPage((prevPage: any) => prevPage + 1);
+        }
+      },
+      {
+        root: null,
+        rootMargin: "0px",
+        threshold: 0.1,
+      }
+    );
+
+    if (currentElement) {
+      observer.observe(currentElement);
+    }
+
+    return () => {
+      if (currentElement) {
+        observer.unobserve(currentElement);
+      }
+    };
+  }, [index, page, setPage]);
+
   return (
     <div className="text-sm grid grid-cols-4 gap-10 border border-t-0 p-4">
       <section className="space-y-2 col-span-1">
