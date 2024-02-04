@@ -1,6 +1,6 @@
-import React, { SetStateAction, useEffect, useState } from "react";
+import React, { SetStateAction, useEffect, useMemo, useState } from "react";
 import OrderCard from "./orderCard";
-import OrdersHeader from "./ordersHeader";
+import OrdersHeader, { OrderTypes } from "./ordersHeader";
 import { calculateOrdersProblems } from "@/lib/helpers/ordersHelpers";
 import { useSearchParams } from "next/navigation";
 
@@ -8,19 +8,17 @@ export default function OrderList({
   orders,
   page,
   setPage,
+  ordersCount
 }: {
   orders: any[];
   page: number;
   setPage: any;
+  ordersCount: number;
 }) {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("query") || "";
-  const [warnings, setWarnings] = useState({
-    weight: 0,
-    carrier: 0,
-  });
 
-  const [orderTyeps, setOrderTypes] = useState<any>({
+  const [orderTypes, setOrderTypes] = useState<OrderTypes>({
     pending: { count: 0, orders: [] },
     shipped: { count: 0, orders: [] },
     unshipped: { count: 0, orders: [] },
@@ -32,37 +30,40 @@ export default function OrderList({
 
   useEffect(() => {
     setOrderTypes(calculateOrdersProblems(orders));
-    console.log(orderTyeps);
   }, [orders]);
 
+  const filteredOrders = useMemo(
+    () =>
+      orders.filter((order) => {
+        if (!searchQuery) return true;
+        return (
+          order.id.includes(searchQuery) ||
+          order.selroOrderId?.includes(searchQuery) ||
+          order.shipPostalCode?.includes(searchQuery) ||
+          order.trackingNumber?.includes(searchQuery)
+        );
+      }),
+    [orders, searchQuery]
+  );
+
   return (
-    <div className="">
+    <div>
       <div className="-mt-16">
-        <OrdersHeader orderTyeps={orderTyeps} />
+        <OrdersHeader  ordersCount={ordersCount} orderTypes={orderTypes} />
       </div>
-      <hr />
-      {orders.length > 0 && (
-        <div className="grid">
-          {orders
-            .filter((order) => {
-              if (searchQuery === "") return true;
-              if (order.id.includes(searchQuery)) return true;
-              if (order.selroOrderId?.includes(searchQuery)) return true;
-              if (order.shipPostalCode?.includes(searchQuery)) return true;
-              if (order.trackingNumber?.includes(searchQuery)) return true;
-              return false;
-            })
-            .map((order, i) => (
-              <OrderCard
-                length={order?.length}
-                page={page}
-                setPage={setPage}
-                index={i}
-                setWarnings={setWarnings}
-                order={order}
-                key={order.id}
-              />
-            ))}
+      {filteredOrders.length > 0 && (
+        <div className="grid mt-6">
+          <hr/>
+          {filteredOrders.map((order, i) => (
+            <OrderCard
+              length={order?.length}
+              page={page}
+              setPage={setPage}
+              index={i}
+              order={order}
+              key={order.id}
+            />
+          ))}
         </div>
       )}
     </div>

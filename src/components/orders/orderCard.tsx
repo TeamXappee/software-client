@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import React, { SetStateAction, useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { ChannelLogo, ServiceTitle, ShippedStatus } from "./customFields";
 import { Dot } from "lucide-react";
 import OrderItemList from "./orderItemList";
@@ -7,14 +7,12 @@ import Warning from "../ui/custom/warning";
 
 export default function OrderCard({
   order,
-  setWarnings,
   index,
   page,
   setPage,
   length,
 }: {
   order: any;
-  setWarnings: React.Dispatch<any>;
   index: number;
   page: number;
   setPage: any;
@@ -73,21 +71,13 @@ export default function OrderCard({
       </section>
       <section>
         <p className="font-bold flex items-center gap-2">
-          {order.carrierName || "null"}{" "}
-          {!order.carrierName && (
-            <Warning warning={"carrier"} setWarnings={setWarnings} />
-          )}
+          {order.carrierName || "null"} {!order.carrierName && <Warning />}
         </p>
-        <ServiceTitle
-          setWarnings={setWarnings}
-          service={order.shippingMethod}
-        />
+        <ServiceTitle service={order.shippingMethod} />
         <br />
         <p className="flex items-center gap-2">
           <CardTitle>total-weight</CardTitle> {order.totalWeight}{" "}
-          {order.totalWeight <= 0 && (
-            <Warning warning={"weight"} setWarnings={setWarnings} />
-          )}
+          {order.totalWeight <= 0 && <Warning />}
         </p>
         <p className="flex items-center gap-2">
           <CardTitle>postal-code</CardTitle>

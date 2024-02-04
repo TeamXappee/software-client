@@ -5,13 +5,15 @@ import PageTitle from "@/components/shared/pageTitle";
 import { Button } from "../ui/button";
 import { SelectChannel } from "./selectChannel";
 import { IChannel } from "@/types/channel";
-import { DownloadCloud } from "lucide-react";
+import { Calculator, DownloadCloud, Link2 } from "lucide-react";
 import { DateRangePicker } from "./dateRangePicker";
 import { fetchOrders } from "@/api/orders";
 import Spinner from "../ui/custom/spinner";
 import OrderList from "../orders/orderList";
 import { toast } from "sonner";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { DashboardMoreActions } from "./dashboardMoreActions";
 
 interface ImportContainerProps {
   channels: IChannel[];
@@ -23,6 +25,7 @@ export default function ImportContainer({ channels }: ImportContainerProps) {
   const initialRange = rangeString ? JSON.parse(rangeString) : undefined;
 
   const [orders, setOrders] = useState<any[]>([]);
+  const ordersCount = orders?.length;
   const [dateRange, setDateRange] = useState<DateRange | undefined>(
     initialRange
   );
@@ -32,12 +35,6 @@ export default function ImportContainer({ channels }: ImportContainerProps) {
   >("idle");
   const [page, setPage] = useState(1);
   const pagesize = 20;
-
-  // useEffect(() => {
-  //   if (page > 1) {
-  //     handleImportOrders();
-  //   }
-  // }, [page, dateRange, selectedChannelIds]);
 
   const handleImportOrders = () => {
     // Define the promise function within the handleImportOrders function
@@ -80,7 +77,7 @@ export default function ImportContainer({ channels }: ImportContainerProps) {
     toast.promise(importOrdersPromise, {
       loading: "Loading...",
       success: (orders: any) => {
-        return `Imported ${orders.length} orders successfully!`;
+        return `Imported ${ordersCount} orders successfully!`;
       },
       error: "Error importing orders",
     });
@@ -102,18 +99,62 @@ export default function ImportContainer({ channels }: ImportContainerProps) {
       }
     );
     const data = await res.json();
-    console.log(data.processedOrders || "no");
   };
+
+  const fixMissingWeight = async () => {
+    try {
+      const res = await fetch("http://localhost:8000/api/orders/fix-weight", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ids: orders.map((order) => order.id),
+        }),
+      });
+      if (!res.ok) {
+        throw new Error("Failed to fix missing weights");
+      }
+      const data = await res.json();
+      if (data.updatedOrders && data.updatedOrders.length > 0) {
+       setOrders([])
+       setTimeout(() => {
+        setOrders(data.updatedOrders);
+       }, 500);
+      }
+    } catch (error) {
+      console.error("Error fixing missing weights:", error);
+    }
+  };
+
   return (
     <div className="p-4">
       <div className="flex justify-between min-h-[175px]">
         <section>
           <PageTitle>Import new orders</PageTitle>
-          <p className="text-muted-foreground text-sm">
-            {orders.length > 0
-              ? `${orders.length} orders imported.`
-              : "No orders imported."}
-          </p>
+          <div className="">
+            <div className="text-muted-foreground text-sm">
+              {ordersCount > 0 ? (
+                <div>
+                  <p>{`${ordersCount} orders imported.`}</p>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      onClick={calculateInvoice}
+                      className="text-sm p-0  text-center gap-1 hover:bg-transparent text-primary hover:text-primary "
+                      size={"sm"}
+                      variant={"ghost"}
+                    >
+                      Generate Invoice{" "}
+                      <Calculator strokeWidth={1.5} size={15} />
+                    </Button>
+                    <DashboardMoreActions fixMissingWeight={fixMissingWeight} />
+                  </div>
+                </div>
+              ) : (
+                "No orders imported."
+              )}
+            </div>
+          </div>
         </section>
         <section>
           <div className="flex flex-col items-end gap-2">
@@ -141,7 +182,12 @@ export default function ImportContainer({ channels }: ImportContainerProps) {
           </div>
         </section>
       </div>
-      <OrderList page={page} setPage={setPage} orders={orders} />
+      <OrderList
+        ordersCount={ordersCount}
+        page={page}
+        setPage={setPage}
+        orders={orders}
+      />
     </div>
   );
 }

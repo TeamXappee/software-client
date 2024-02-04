@@ -3,8 +3,25 @@ import { Input } from "../ui/input";
 import React, { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Dot } from "lucide-react";
 
-export default function OrdersHeader({ orderTyeps }: { orderTyeps: any }) {
+export type OrderTypes = {
+  pending: { count: number; orders: any[] };
+  shipped: { count: number; orders: any[] };
+  unshipped: { count: number; orders: any[] };
+  cancelled: { count: number; orders: any[] };
+  missing_weight: { count: number; orders: any[] };
+  missing_carrier: { count: number; orders: any[] };
+  missing_service: { count: number; orders: any[] };
+};
+
+export default function OrdersHeader({
+  orderTypes,
+  ordersCount,
+}: {
+  orderTypes: OrderTypes;
+  ordersCount: number;
+}) {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("query") || "";
   const [query, setQuery] = useState(searchQuery);
@@ -17,36 +34,31 @@ export default function OrdersHeader({ orderTyeps }: { orderTyeps: any }) {
     params.set("query", query);
     router.replace(`${pathname}?${params.toString()}`);
   }, [query]);
+
   return (
-    <div className="relative -top-[3.5rem] -mb-[2rem] grid gap-2 w-[75%]">
+    <div className="relative flex items-center -top-[1.45rem] -mb-[2rem]  gap-2 w-[75%]">
       <div className="flex flex-wrap gap-1">
-        <OrderTypeCard className="bg-green-400/30">
-          Shipped {orderTyeps.shipped.count}
-        </OrderTypeCard>
-        <OrderTypeCard className="bg-orange-400/40">
-          Unshipped {orderTyeps.unshipped.count}
-        </OrderTypeCard>
-        <OrderTypeCard className="bg-red-400/50">
-          Cancelled {orderTyeps.cancelled.count}
-        </OrderTypeCard>
-        <OrderTypeCard className="bg-yellow-400/30">
-          Missing carrier {orderTyeps.missing_carrier.count}
-        </OrderTypeCard>
-        <OrderTypeCard className="bg-yellow-400/30">
-          Missing service {orderTyeps.missing_service.count}
-        </OrderTypeCard>
-        <OrderTypeCard className="bg-yellow-400/30">
-          Missing weight {orderTyeps.missing_weight.count}
-        </OrderTypeCard>
+        {Object.entries(orderTypes).map(
+          ([key, { count }]) =>
+            count > 0 && (
+              <OrderTypeCard key={key} className={`bg-secondary`}>
+                {`${key.replace("_", " ")} ${count}`}
+              </OrderTypeCard>
+            )
+        )}
       </div>
-      <div className=" flex gap-2 items-center">
-        <Input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search..."
-          className=" max-w-[225px] "
-        />
-      </div>
+
+      {ordersCount > 0 && (
+        <>
+          <Dot className="text-primary" />
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search..."
+            className="max-w-[225px] rounded-xl"
+          />
+        </>
+      )}
     </div>
   );
 }

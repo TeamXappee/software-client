@@ -25,17 +25,11 @@ export function ChannelLogo({ channel }: { channel: string }) {
   );
 }
 
-export function ServiceTitle({
-  service,
-  setWarnings,
-}: {
-  service: string | undefined;
-  setWarnings: React.Dispatch<any>;
-}) {
+export function ServiceTitle({ service }: { service: string | undefined }) {
   if (!service)
     return (
       <p className="flex items-center gap-2">
-        null <Warning setWarnings={setWarnings} warning={"service"} />
+        null <Warning />
       </p>
     );
 
