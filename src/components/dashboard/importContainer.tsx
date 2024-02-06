@@ -1,193 +1,70 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { DateRange } from "react-day-picker";
 import PageTitle from "@/components/shared/pageTitle";
-import { Button } from "../ui/button";
-import { SelectChannel } from "./selectChannel";
 import { IChannel } from "@/types/channel";
-import { Calculator, DownloadCloud, Link2 } from "lucide-react";
-import { DateRangePicker } from "./dateRangePicker";
-import { fetchOrders } from "@/api/orders";
-import Spinner from "../ui/custom/spinner";
 import OrderList from "../orders/orderList";
-import { toast } from "sonner";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
-import { DashboardMoreActions } from "./dashboardMoreActions";
+import { useSelector } from "@/lib/redux/store";
+import { selectOrderSlice } from "@/lib/redux/slices/orderSlice";
+import OrderCategories from "../orders/orderCategories";
+import ImportingActions from "./importingActions";
+import Spinner from "../ui/custom/spinner";
+import OrdersMoreActions from "./ordersMoreActions";
 
 interface ImportContainerProps {
   channels: IChannel[];
+  carriers: any[];
 }
 
-export default function ImportContainer({ channels }: ImportContainerProps) {
-  const searchParams = useSearchParams();
-  const rangeString = searchParams.get("range");
-  const initialRange = rangeString ? JSON.parse(rangeString) : undefined;
+export default function ImportContainer({
+  channels,
+  carriers,
+}: ImportContainerProps) {
+  const memoriezedCarrierData = useMemo(() => carriers, [carriers]);
 
-  const [orders, setOrders] = useState<any[]>([]);
-  const ordersCount = orders?.length;
+  const searchParams = useSearchParams();
+  const rangeString = searchParams.get("range") || "";
+  const initialRange = rangeString ? JSON.parse(rangeString||"") : undefined;
+
   const [dateRange, setDateRange] = useState<DateRange | undefined>(
     initialRange
   );
   const [selectedChannelIds, setSelectedChannelIds] = useState<number[]>([]);
-  const [importingStatus, setImportingStatus] = useState<
-    "idle" | "loading" | "success" | "fail"
-  >("idle");
-  const [page, setPage] = useState(1);
-  const pagesize = 20;
-
-  const handleImportOrders = () => {
-    // Define the promise function within the handleImportOrders function
-    const importOrdersPromise = () =>
-      new Promise(async (resolve, reject) => {
-        if (
-          importingStatus === "loading" ||
-          !dateRange ||
-          !dateRange.from ||
-          !dateRange.to
-        ) {
-          reject("Invalid import conditions");
-          return;
-        }
-
-        setImportingStatus("loading");
-        try {
-          const response = await fetchOrders(
-            dateRange.from,
-            dateRange.to,
-            selectedChannelIds,
-            page,
-            pagesize
-          );
-          if (response.ok) {
-            const data = await response.json();
-            setOrders(data.orders);
-            resolve(data.orders);
-          } else {
-            throw new Error("Failed to import orders");
-          }
-        } catch (err) {
-          console.log(err);
-          reject(err);
-        } finally {
-          setImportingStatus("idle");
-        }
-      });
-
-    toast.promise(importOrdersPromise, {
-      loading: "Loading...",
-      success: (orders: any) => {
-        return `Imported ${ordersCount} orders successfully!`;
-      },
-      error: "Error importing orders",
-    });
-  };
-
-  const calculateInvoice = async () => {
-    const res = await fetch(
-      "http://localhost:8000/api/orders/calculateInvoice",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: dateRange?.from,
-          to: dateRange?.to,
-          channelIds: selectedChannelIds,
-        }),
-      }
-    );
-    const data = await res.json();
-  };
-
-  const fixMissingWeight = async () => {
-    try {
-      const res = await fetch("http://localhost:8000/api/orders/fix-weight", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ids: orders.map((order) => order.id),
-        }),
-      });
-      if (!res.ok) {
-        throw new Error("Failed to fix missing weights");
-      }
-      const data = await res.json();
-      if (data.updatedOrders && data.updatedOrders.length > 0) {
-       setOrders([])
-       setTimeout(() => {
-        setOrders(data.updatedOrders);
-       }, 500);
-      }
-    } catch (error) {
-      console.error("Error fixing missing weights:", error);
-    }
-  };
+  const { ordersCount, ordersStatus } = useSelector(selectOrderSlice);
 
   return (
     <div className="p-4">
       <div className="flex justify-between min-h-[175px]">
         <section>
-          <PageTitle>Import new orders</PageTitle>
-          <div className="">
-            <div className="text-muted-foreground text-sm">
-              {ordersCount > 0 ? (
-                <div>
-                  <p>{`${ordersCount} orders imported.`}</p>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      onClick={calculateInvoice}
-                      className="text-sm p-0  text-center gap-1 hover:bg-transparent text-primary hover:text-primary "
-                      size={"sm"}
-                      variant={"ghost"}
-                    >
-                      Generate Invoice{" "}
-                      <Calculator strokeWidth={1.5} size={15} />
-                    </Button>
-                    <DashboardMoreActions fixMissingWeight={fixMissingWeight} />
-                  </div>
-                </div>
-              ) : (
-                "No orders imported."
-              )}
-            </div>
-          </div>
-        </section>
-        <section>
-          <div className="flex flex-col items-end gap-2">
-            <DateRangePicker
+          <div className="flex  items-center gap-2">
+            <PageTitle>Import new orders</PageTitle>
+            <OrdersMoreActions
               dateRange={dateRange}
-              handleDateChange={setDateRange}
-            />
-            <SelectChannel
               selectedChannelIds={selectedChannelIds}
-              setSelectedChannelIds={setSelectedChannelIds}
-              channels={channels}
             />
-            <Button
-              onClick={handleImportOrders}
-              disabled={importingStatus === "loading"}
-              className="gap-2 font-semibold"
-            >
-              Import
-              {importingStatus === "loading" ? (
-                <Spinner />
-              ) : (
-                <DownloadCloud size={20} strokeWidth={2} />
-              )}
-            </Button>
+            {ordersStatus === "loading" && <Spinner />}
           </div>
+
+          {ordersCount && ordersCount > 0 ? (
+            <div className="flex gap-2 items-center">
+              <p className="text-muted-foreground text-sm">{`${ordersCount} orders imported.`}</p>
+            </div>
+          ) : (
+            <p className="text-muted-foreground text-sm">No orders imported.</p>
+          )}
         </section>
+
+        <ImportingActions
+          channels={channels}
+          dateRange={dateRange}
+          selectedChannelIds={selectedChannelIds}
+          setDateRange={setDateRange}
+          setSelectedChannelIds={setSelectedChannelIds}
+        />
       </div>
-      <OrderList
-        ordersCount={ordersCount}
-        page={page}
-        setPage={setPage}
-        orders={orders}
-      />
+      <OrderCategories />
+      <OrderList carriers={memoriezedCarrierData} />
     </div>
   );
 }

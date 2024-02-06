@@ -10,7 +10,6 @@ export default function UserAvatar({
   user: TUser;
   className?: string;
 }) {
-  console.log(user)
 
   return (
     <Avatar className={cn("cursor-pointer h-[1.7rem] w-[1.7rem]", className)}>

@@ -29,10 +29,11 @@ export function DateRangePicker({
   const pathname = usePathname();
 
   React.useEffect(() => {
-    handleDateChange(date);
+    if (!date) return;
     const params = new URLSearchParams(searchParams);
     params.set("range", JSON.stringify(date));
     router.replace(`${pathname}?${params.toString()}`);
+    handleDateChange(date);
   }, [date]);
 
   return (

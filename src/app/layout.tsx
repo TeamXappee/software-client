@@ -7,6 +7,7 @@ import { getCurrentSession } from "../../auth";
 import Header from "@/components/layout/header/header";
 import Footer from "@/components/layout/footer/footer";
 import { Toaster } from "@/contexts/toasterProvider";
+import { ReduxProvider } from "@/contexts/reduxProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,14 +26,16 @@ export default async function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <ThemeProvider>
-          <SessionProvider session={session}>
-            <Toaster richColors />
-            <Header />
-            <div className="min-h-[var(--container-height)] w-full">
-              {children}
-            </div>
-            <Footer />
-          </SessionProvider>
+          <ReduxProvider>
+            <SessionProvider session={session}>
+              <Toaster richColors />
+              <Header />
+              <div className="min-h-[var(--container-height)] w-full">
+                {children}
+              </div>
+              <Footer />
+            </SessionProvider>
+          </ReduxProvider>
         </ThemeProvider>
       </body>
     </html>

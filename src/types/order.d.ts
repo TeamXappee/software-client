@@ -78,3 +78,14 @@ export interface IOrderTypes {
   missing_carrier: number;
   missing_service: number;
 }
+
+
+export type OrderTypes = {
+  pending: { count: number; orders: any[] };
+  shipped: { count: number; orders: any[] };
+  unshipped: { count: number; orders: any[] };
+  cancelled: { count: number; orders: any[] };
+  missing_weight: { count: number; orders: any[] };
+  missing_carrier: { count: number; orders: any[] };
+  missing_service: { count: number; orders: any[] };
+};

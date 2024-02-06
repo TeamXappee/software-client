@@ -1,71 +1,93 @@
-import React, { SetStateAction, useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import OrderCard from "./orderCard";
-import OrdersHeader, { OrderTypes } from "./ordersHeader";
-import { calculateOrdersProblems } from "@/lib/helpers/ordersHelpers";
 import { useSearchParams } from "next/navigation";
+import { useSelector } from "@/lib/redux/store";
+import { selectOrderSlice } from "@/lib/redux/slices/orderSlice";
+import Spinner from "../ui/custom/spinner";
 
-export default function OrderList({
-  orders,
-  page,
-  setPage,
-  ordersCount
-}: {
-  orders: any[];
-  page: number;
-  setPage: any;
-  ordersCount: number;
-}) {
+export default function OrderList({ carriers }: { carriers: any[] }) {
+  const { orders } = useSelector(selectOrderSlice);
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get("query") || "";
+  const category = searchParams.get("category") || null;
+  const [isLoading, setIsLoading] = useState(false);
 
-  const [orderTypes, setOrderTypes] = useState<OrderTypes>({
-    pending: { count: 0, orders: [] },
-    shipped: { count: 0, orders: [] },
-    unshipped: { count: 0, orders: [] },
-    cancelled: { count: 0, orders: [] },
-    missing_weight: { count: 0, orders: [] },
-    missing_carrier: { count: 0, orders: [] },
-    missing_service: { count: 0, orders: [] },
-  });
-
+  // Simulate loading state on search query or category change
   useEffect(() => {
-    setOrderTypes(calculateOrdersProblems(orders));
-  }, [orders]);
+    if (searchQuery || category) {
+      setIsLoading(true);
+      // Simulate a delay to show the spinner, then set loading to false
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 500); // Adjust delay as needed
+
+      return () => clearTimeout(timer);
+    }
+  }, [searchQuery, category]);
 
   const filteredOrders = useMemo(
     () =>
-      orders.filter((order) => {
-        if (!searchQuery) return true;
-        return (
-          order.id.includes(searchQuery) ||
-          order.selroOrderId?.includes(searchQuery) ||
-          order.shipPostalCode?.includes(searchQuery) ||
-          order.trackingNumber?.includes(searchQuery)
-        );
+      orders.filter((order: any) => {
+        const matchesSearchQuery = searchQuery
+          ? order.id.includes(searchQuery) ||
+            order.selroOrderId?.includes(searchQuery) ||
+            order.shipPostalCode?.includes(searchQuery) ||
+            order.trackingNumber?.includes(searchQuery)
+          : true;
+
+        // Filter by category if category is not null
+        const matchesItemCategory = category
+          ? order.channelSales?.some((channelSale: any) =>
+              category === "shipped"
+                ? channelSale.orderStatus === "Shipped"
+                : category === "cancelled"
+                ? channelSale.orderStatus === "Canceled"
+                : category === "unshipped"
+                ? channelSale.orderStatus === "Unshipped"
+                : true
+            )
+          : true;
+
+        const matchOrdercategory =
+          category === "missing_weight"
+            ? order.totalWeight === 0
+            : category === "missing_carrier"
+            ? !order.carrierName && true
+            : category === "missing_service"
+            ? !order.shippingMethod && true
+            : true;
+
+        return matchesSearchQuery && matchesItemCategory && matchOrdercategory;
       }),
-    [orders, searchQuery]
+    [orders, searchQuery, category]
+  );
+
+  filteredOrders.sort((a: any, b: any) =>
+    a.selroOrderId > b.selroOrderId ? 1 : -1
   );
 
   return (
-    <div>
-      <div className="-mt-16">
-        <OrdersHeader  ordersCount={ordersCount} orderTypes={orderTypes} />
-      </div>
-      {filteredOrders.length > 0 && (
+    <>
+      {isLoading ? (
+       <div className="grid place-content-center mt-[40vh]">
+         <Spinner />
+       </div>
+      ) : filteredOrders.length > 0 ? (
         <div className="grid mt-6">
-          <hr/>
-          {filteredOrders.map((order, i) => (
+          <hr />
+          {filteredOrders.map((order: any, i: number) => (
             <OrderCard
+              carriers={carriers}
               length={order?.length}
-              page={page}
-              setPage={setPage}
               index={i}
               order={order}
               key={order.id}
             />
           ))}
         </div>
+      ) : (
+        <div className="text-center mt-[40vh] text-muted-foreground">No results found.</div>
       )}
-    </div>
+    </>
   );
 }

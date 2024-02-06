@@ -39,7 +39,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
+import Spinner from "../ui/custom/spinner";
 
 export const columns: ColumnDef<any>[] = [
   {
@@ -135,7 +135,13 @@ export const columns: ColumnDef<any>[] = [
   },
 ];
 
-export function ItemsTable({ data }: { data: any[] }) {
+export function ItemsTable({
+  data,
+  isFetching,
+}: {
+  data: any[];
+  isFetching: boolean;
+}) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -243,7 +249,7 @@ export function ItemsTable({ data }: { data: any[] }) {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  {isFetching ? <Spinner /> : "No results."}
                 </TableCell>
               </TableRow>
             )}

@@ -1,3 +1,4 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -7,8 +8,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { ArrowDown, ChevronDown, PackagePlus, UploadCloud } from "lucide-react";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChevronDown, PackagePlus, UploadCloud } from "lucide-react";
+import { ChangeEvent, useState } from "react";
 import NewItem from "./newItem";
 
 const getNewInitialItemValue = () => ({
@@ -55,7 +56,6 @@ export function NewItemsDialog() {
       body: JSON.stringify({ newItems: newItems }),
     });
     const data = await res.json();
-    console.log(data, "done");
   };
   return (
     <Dialog>

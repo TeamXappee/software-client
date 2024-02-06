@@ -1,97 +1,87 @@
 import { format } from "date-fns";
-import React, { useEffect, useRef } from "react";
-import { ChannelLogo, ServiceTitle, ShippedStatus } from "./customFields";
-import { Dot } from "lucide-react";
+import React, { useMemo, useState } from "react";
+import { ChannelLogo, ServiceTitle } from "./customFields";
+import { ArrowRight, Asterisk, Dot } from "lucide-react";
 import OrderItemList from "./orderItemList";
 import Warning from "../ui/custom/warning";
+import { OrderContextMenu } from "./orderContextMenu";
+import { ContextMenu, ContextMenuTrigger } from "../ui/context-menu";
 
 export default function OrderCard({
   order,
   index,
-  page,
-  setPage,
   length,
+  carriers,
 }: {
   order: any;
   index: number;
-  page: number;
-  setPage: any;
   length: number;
+  carriers: any;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const currentElement = ref.current;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && index === length - 5) {
-          setPage((prevPage: any) => prevPage + 1);
-        }
-      },
-      {
-        root: null,
-        rootMargin: "0px",
-        threshold: 0.1,
-      }
-    );
-
-    if (currentElement) {
-      observer.observe(currentElement);
-    }
-
-    return () => {
-      if (currentElement) {
-        observer.unobserve(currentElement);
-      }
-    };
-  }, [index, page, setPage]);
-
+  const memoriezedOrder = useMemo(() => order, [order]);
+  const [isContextMenuOpen, setIsContextMenuOpen] = useState(false);
   return (
-    <div className="text-sm grid grid-cols-4 gap-10 border border-t-0 p-4">
-      <section className="space-y-2 col-span-1">
-        <div className="opacity-80 text-sm flex items-center">
-          <p>{format(new Date(order.date), "yyyy-MM-dd")}</p>
-          <Dot size={20} className="text-primary" />
-          <p>{format(new Date(order.date), "hh:mm:ss")}</p>
-        </div>
-        <div>
-          <p className="font-bold">{`(${order.selroChannelName})`}</p>
-          <ChannelLogo channel={order.channel} />
-        </div>
-        <div>
-          <p>
-            <CardTitle>order id</CardTitle>
-            {order.id}
-          </p>
-          <p>
-            <CardTitle>selro id</CardTitle>
-            {order.selroOrderId}
-          </p>
-        </div>
-      </section>
-      <section>
-        <p className="font-bold flex items-center gap-2">
-          {order.carrierName || "null"} {!order.carrierName && <Warning />}
-        </p>
-        <ServiceTitle service={order.shippingMethod} />
-        <br />
-        <p className="flex items-center gap-2">
-          <CardTitle>total-weight</CardTitle> {order.totalWeight}{" "}
-          {order.totalWeight <= 0 && <Warning />}
-        </p>
-        <p className="flex items-center gap-2">
-          <CardTitle>postal-code</CardTitle>
-          {order.shipPostalCode || "null"}
-        </p>
-      </section>
-      <OrderItemList channelSales={order.channelSales} />
-    </div>
+    <>
+      <ContextMenu
+        modal={false}
+        onOpenChange={() => setIsContextMenuOpen(!isContextMenuOpen)}
+      >
+        <ContextMenuTrigger className="text-sm grid grid-cols-4 gap-10 border border-t-0 p-4 relative overflow-x-hidden ">
+          <section className="space-y-2 col-span-1">
+            <div className="opacity-80 text-sm flex items-center">
+              <p>{format(new Date(order.date), "yyyy-MM-dd")}</p>
+              <Dot size={20} className="text-primary" />
+              <p>{format(new Date(order.date), "hh:mm:ss")}</p>
+            </div>
+            <div>
+              <p className="font-bold">{`(${order.selroChannelName})`}</p>
+              <ChannelLogo channel={order.channel} />
+            </div>
+            <div>
+              <p className="flex items-center">
+                <Asterisk
+                  size={18}
+                  className={`text-primary ease-in-out duration-150  ${
+                    !isContextMenuOpen && "-ml-8 mr-[.78rem]"
+                  }`}
+                />
+                <CardTitle>order id </CardTitle>
+                <span className={`${isContextMenuOpen && "text-primary"}`}>
+                  {" "}
+                  {order.id}
+                </span>
+              </p>
+              <p>
+                <CardTitle>selro id</CardTitle>
+                {order.selroOrderId}
+              </p>
+            </div>
+          </section>
+          <section>
+            <p className="font-bold flex items-center gap-2">
+              {order.carrierName || "null"} {!order.carrierName && <Warning />}
+            </p>
+            <ServiceTitle service={order.shippingMethod} />
+            <br />
+            <p className="flex items-center gap-2">
+              <CardTitle>total-weight</CardTitle> {order.totalWeight}{" "}
+              {order.totalWeight <= 0 && <Warning />}
+            </p>
+            <p className="flex items-center gap-2">
+              <CardTitle>postal-code</CardTitle>
+              {order.shipPostalCode || "null"}
+            </p>
+          </section>
+          <OrderItemList channelSales={order.channelSales} />
+          <OrderContextMenu order={memoriezedOrder} carriers={carriers} />
+        </ContextMenuTrigger>
+      </ContextMenu>
+    </>
   );
 }
 
 export const CardTitle = ({
   children,
-  className,
 }: {
   children: React.ReactNode;
   className?: string;

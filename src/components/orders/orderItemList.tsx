@@ -1,7 +1,9 @@
 import React from "react";
 import { CardTitle } from "./orderCard";
 import { ShippedStatus } from "./customFields";
-import { Dot } from "lucide-react";
+import { Dot, UploadCloud } from "lucide-react";
+import { NewItemsDialog } from "../items/newItemsDialog";
+import { NewItemFromSku } from "./newItemFromsku";
 
 export default function OrderItemList({
   channelSales,
@@ -11,7 +13,7 @@ export default function OrderItemList({
   const itemsLength = channelSales.length;
   return (
     <section
-      className={`space-y-2 col-span-2 max-h-[20vh] overflow-y-auto pretty-scrollbar`}
+      className={`space-y-2 col-span-2  max-h-[125px] overflow-y-auto pretty-scrollbar`}
     >
       {itemsLength > 1 && (
         <p className="font-bold text-xs flex items-center -ml-2">
@@ -29,9 +31,10 @@ export default function OrderItemList({
             </p>
             <div className="grid grid-cols-2 mt-1">
               <div>
-                <p>
+                <p className="flex items-center gap-2">
                   <CardTitle>SKU</CardTitle>
                   {sale.sku}
+                  {!sale.weight && <NewItemFromSku item={sale} />}
                 </p>
                 <p>
                   <CardTitle>tracking number</CardTitle>
@@ -40,7 +43,7 @@ export default function OrderItemList({
                 <ShippedStatus status={sale.orderStatus} />
               </div>
               <div>
-                <CardTitle >weight</CardTitle>
+                <CardTitle>weight</CardTitle>
                 {sale.weight}
               </div>
             </div>

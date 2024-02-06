@@ -14,8 +14,8 @@ const providers = [
   }),
 ];
 const pages = {
-  signIn: "/login",
-  newUser: "/register",
+  signIn: "/auth/login",
+  newUser: "/auth/register",
 };
 const callbacks = {};
 

@@ -1,5 +1,6 @@
 import React from "react";
 import Warning from "../ui/custom/warning";
+import Image from "next/image";
 
 export function ShippedStatus({ status }: { status: string }) {
   return (
@@ -15,9 +16,11 @@ export function ShippedStatus({ status }: { status: string }) {
 
 export function ChannelLogo({ channel }: { channel: string }) {
   return (
-    <img
+    <Image
       src={`/${channel}.png`}
       alt={`${channel} logo`}
+      width={400}
+      height={200}
       className={` ${
         channel === "amazon" && "dark:invert"
       } w-14 aspect-video object-contain`}
