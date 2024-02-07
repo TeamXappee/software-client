@@ -22,7 +22,8 @@ export default function ImportingActions(props: Props) {
   const { ordersStatus } = useSelector(selectOrderSlice);
   const dispatch = useDispatch();
   return (
-    <section className="flex flex-col items-end gap-2">
+    <section className="flex items-start">
+      <div className="flex items-center gap-2">
       <DateRangePicker
         dateRange={props.dateRange}
         handleDateChange={props.setDateRange}
@@ -42,7 +43,7 @@ export default function ImportingActions(props: Props) {
           )
         }
         disabled={ordersStatus === "loading"}
-        className="gap-2 font-semibold"
+        className="gap-2 font-semibold h-9 rounded-xl"
       >
         Import
         {ordersStatus === "loading" ? (
@@ -51,6 +52,7 @@ export default function ImportingActions(props: Props) {
           <DownloadCloud size={20} strokeWidth={2} />
         )}
       </Button>
+      </div>
     </section>
   );
 }

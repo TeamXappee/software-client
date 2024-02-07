@@ -25,7 +25,7 @@ export default function ItemsContainer() {
 
   useEffect(() => {
     fetchMoreData();
-  }, [fetchMoreData]);
+  }, [isFetching]);
 
   return (
     <div>

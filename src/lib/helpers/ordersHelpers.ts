@@ -13,7 +13,7 @@ export const calculateOrdersProblems = (orders: any[]) => {
 
   orders.filter((order: any) => {
     const status = order.channelSales[0]?.orderStatus;
-    if (status === "pending") {
+    if (status === "Pending") {
       orderTypes.pending.count++;
       (orderTypes.pending.orders as any[]).push(order.id);
     } else if (status === "Shipped") {

@@ -10,13 +10,11 @@ import { ContextMenu, ContextMenuTrigger } from "../ui/context-menu";
 export default function OrderCard({
   order,
   index,
-  length,
   carriers,
 }: {
   order: any;
   index: number;
-  length: number;
-  carriers: any;
+  carriers?: any;
 }) {
   const memoriezedOrder = useMemo(() => order, [order]);
   const [isContextMenuOpen, setIsContextMenuOpen] = useState(false);
@@ -73,7 +71,7 @@ export default function OrderCard({
             </p>
           </section>
           <OrderItemList channelSales={order.channelSales} />
-          <OrderContextMenu order={memoriezedOrder} carriers={carriers} />
+          <OrderContextMenu index={index} order={memoriezedOrder} carriers={carriers} />
         </ContextMenuTrigger>
       </ContextMenu>
     </>

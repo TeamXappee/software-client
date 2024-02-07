@@ -3,7 +3,6 @@ import { useMemo, useState } from "react";
 import { DateRange } from "react-day-picker";
 import PageTitle from "@/components/shared/pageTitle";
 import { IChannel } from "@/types/channel";
-import OrderList from "../orders/orderList";
 import { useSearchParams } from "next/navigation";
 import { useSelector } from "@/lib/redux/store";
 import { selectOrderSlice } from "@/lib/redux/slices/orderSlice";
@@ -11,6 +10,8 @@ import OrderCategories from "../orders/orderCategories";
 import ImportingActions from "./importingActions";
 import Spinner from "../ui/custom/spinner";
 import OrdersMoreActions from "./ordersMoreActions";
+import { TrashSheet } from "../trash/trashSheet";
+import FilteredOrdersList from "../orders/filteredOrders";
 
 interface ImportContainerProps {
   channels: IChannel[];
@@ -21,11 +22,14 @@ export default function ImportContainer({
   channels,
   carriers,
 }: ImportContainerProps) {
+  const { orders } = useSelector(selectOrderSlice);
+
+  const memoriezedOrders = useMemo(() => orders, [orders]);
   const memoriezedCarrierData = useMemo(() => carriers, [carriers]);
 
   const searchParams = useSearchParams();
   const rangeString = searchParams.get("range") || "";
-  const initialRange = rangeString ? JSON.parse(rangeString||"") : undefined;
+  const initialRange = rangeString ? JSON.parse(rangeString || "") : undefined;
 
   const [dateRange, setDateRange] = useState<DateRange | undefined>(
     initialRange
@@ -35,10 +39,12 @@ export default function ImportContainer({
 
   return (
     <div className="p-4">
-      <div className="flex justify-between min-h-[175px]">
-        <section>
+      <div className="flex justify-between sticky top-0 bg-background py-2  min-h-[115px] z-20 ">
+        <section className="w-full">
           <div className="flex  items-center gap-2">
-            <PageTitle>Import new orders</PageTitle>
+            <PageTitle>
+              <span id="import">Orders</span>
+            </PageTitle>
             <OrdersMoreActions
               dateRange={dateRange}
               selectedChannelIds={selectedChannelIds}
@@ -47,24 +53,37 @@ export default function ImportContainer({
           </div>
 
           {ordersCount && ordersCount > 0 ? (
-            <div className="flex gap-2 items-center">
+            <div className="flex gap-2  flex-col">
               <p className="text-muted-foreground text-sm">{`${ordersCount} orders imported.`}</p>
+              <div className="space-y-2 ">
+                <OrderCategories
+                  orders={memoriezedOrders}
+                  ordersCount={ordersCount}
+                  categoryKey="category"
+                  searchKey="query"
+                />
+              </div>
             </div>
           ) : (
             <p className="text-muted-foreground text-sm">No orders imported.</p>
           )}
         </section>
 
-        <ImportingActions
-          channels={channels}
-          dateRange={dateRange}
-          selectedChannelIds={selectedChannelIds}
-          setDateRange={setDateRange}
-          setSelectedChannelIds={setSelectedChannelIds}
-        />
+        <div className="flex flex-col items-end gap-4">
+          <ImportingActions
+            channels={channels}
+            dateRange={dateRange}
+            selectedChannelIds={selectedChannelIds}
+            setDateRange={setDateRange}
+            setSelectedChannelIds={setSelectedChannelIds}
+          />
+          <TrashSheet />
+        </div>
       </div>
-      <OrderCategories />
-      <OrderList carriers={memoriezedCarrierData} />
+      <FilteredOrdersList
+        orders={memoriezedOrders}
+        carriers={memoriezedCarrierData}
+      />
     </div>
   );
 }

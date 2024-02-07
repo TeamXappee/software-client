@@ -1,25 +1,23 @@
-import React, { useEffect, useMemo, useState } from "react";
-import OrderCard from "./orderCard";
 import { useSearchParams } from "next/navigation";
-import { useSelector } from "@/lib/redux/store";
-import { selectOrderSlice } from "@/lib/redux/slices/orderSlice";
+import React, { useEffect, useMemo, useState } from "react";
 import Spinner from "../ui/custom/spinner";
+import { Button } from "../ui/button";
+import { ChevronUp } from "lucide-react";
+import TrashOrderCard from "../trash/trashOrderCard";
 
-export default function OrderList({ carriers }: { carriers: any[] }) {
-  const { orders } = useSelector(selectOrderSlice);
+export default function FilteredTrashOrders({ orders }: { orders: any }) {
   const searchParams = useSearchParams();
-  const searchQuery = searchParams.get("query") || "";
-  const category = searchParams.get("category") || null;
+  const searchQuery = searchParams.get("trash-query") || "";
+  const category = searchParams.get("trash-category") || null;
   const [isLoading, setIsLoading] = useState(false);
 
-  // Simulate loading state on search query or category change
   useEffect(() => {
     if (searchQuery || category) {
       setIsLoading(true);
       // Simulate a delay to show the spinner, then set loading to false
       const timer = setTimeout(() => {
         setIsLoading(false);
-      }, 500); // Adjust delay as needed
+      }, 50); // Adjust delay as needed
 
       return () => clearTimeout(timer);
     }
@@ -65,28 +63,37 @@ export default function OrderList({ carriers }: { carriers: any[] }) {
   filteredOrders.sort((a: any, b: any) =>
     a.selroOrderId > b.selroOrderId ? 1 : -1
   );
-
   return (
     <>
       {isLoading ? (
-       <div className="grid place-content-center mt-[40vh]">
-         <Spinner />
-       </div>
+        <div className="grid place-content-center mt-[40vh]">
+          <Spinner />
+        </div>
       ) : filteredOrders.length > 0 ? (
-        <div className="grid mt-6">
-          <hr />
+        <div className="mt-4 grid grid-cols-4 gap-2">
           {filteredOrders.map((order: any, i: number) => (
-            <OrderCard
-              carriers={carriers}
-              length={order?.length}
-              index={i}
-              order={order}
-              key={order.id}
-            />
+            <TrashOrderCard index={i} order={order} key={order.id + "-trash"} />
           ))}
+          {filteredOrders.length > 20 && (
+            <div className="flex justify-end mt-4">
+              <Button
+                variant="ghost"
+                className="flex items-stretch gap-2 group"
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              >
+                Back to top
+                <ChevronUp
+                  className="group-hover:-mt-3 duration-300 ease-in-out"
+                  size={20}
+                />
+              </Button>
+            </div>
+          )}
         </div>
       ) : (
-        <div className="text-center mt-[40vh] text-muted-foreground">No results found.</div>
+        <div className="text-center mt-[40vh] text-muted-foreground">
+          No results found.
+        </div>
       )}
     </>
   );

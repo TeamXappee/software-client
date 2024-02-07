@@ -45,7 +45,7 @@ export function SelectChannel({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[250px] justify-between "
+          className="w-[250px] justify-between rounded-xl "
         >
           {selectedChannelIds.length > 0
             ? `${selectedChannelIds.length} channels selected`
@@ -53,7 +53,7 @@ export function SelectChannel({
           <CaretSortIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[250px] p-0 overflow-y-auto max-h-[70vh]">
+      <PopoverContent className="w-[250px] rounded-2xl p-0 overflow-y-auto max-h-[70vh]">
         <Command>
           <CommandInput placeholder="Search channel..." className="h-9" />
           <CommandEmpty>No channel found.</CommandEmpty>
@@ -63,7 +63,7 @@ export function SelectChannel({
                 key={channel.channel_id}
                 value={channel.channel_id.toString()}
                 onSelect={() => toggleChannelSelection(channel.channel_id)}
-                className="text-sm"
+                className="text-sm  rounded-xl"
               >
                 {channel.name}
                 <span className="text-muted-foreground">{`(${channel.type})`}</span>

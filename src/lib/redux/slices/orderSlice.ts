@@ -1,19 +1,26 @@
-import { fetchOrders } from "@/api/orders";
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { DateRange } from "react-day-picker";
 import { fetchOrdersThunkReducers } from "./thunks/fetchOrdersthunk";
 import { fixOrdersThunkReducers } from "./thunks/fixOrdersThunk";
+import { softDeleteOrderThunkReducers } from "./thunks/softDeleteOrderThunk";
+import { fetchSoftDeletedOrdersThunkReducers } from "./thunks/fetchSoftDeletedOrdersThunk";
+
+import { restoreOrderThunkReucers } from "./thunks/restoreOrderThunk";
+
+import { createSlice } from "@reduxjs/toolkit";
 
 export interface OrderSliceInitialState {
   orders: any[];
+  trash: any[];
   ordersStatus: "idle" | "loading" | "succeeded" | "failed";
+  trashStatus: "idle" | "loading" | "succeeded" | "failed";
   ordersError?: string | undefined;
   ordersCount?: number;
 }
 
 const initialState: OrderSliceInitialState = {
   orders: [],
+  trash: [],
   ordersStatus: "idle",
+  trashStatus: "idle",
   ordersError: undefined,
   ordersCount: 0,
 };
@@ -25,6 +32,9 @@ export const orderSlice = createSlice({
   extraReducers(builder) {
     fetchOrdersThunkReducers(builder);
     fixOrdersThunkReducers(builder);
+    fetchSoftDeletedOrdersThunkReducers(builder);
+    softDeleteOrderThunkReducers(builder);
+    restoreOrderThunkReucers(builder);
   },
 });
 
