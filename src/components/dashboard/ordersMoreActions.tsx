@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { BrainCircuit, CloudCog, MoreHorizontal } from "lucide-react";
 import { useDispatch, useSelector } from "@/lib/redux/store";
-import { selectOrderSlice } from "@/lib/redux/slices/orderSlice";
+import { orderSlice, selectOrderSlice } from "@/lib/redux/slices/orderSlice";
 import { fixOrdersThunk } from "@/lib/redux/slices/thunks/fixOrdersThunk";
 import { useRouter } from "next/navigation";
 export default function OrdersMoreActions({
@@ -24,6 +24,7 @@ export default function OrdersMoreActions({
 
   const dispatch = useDispatch();
   const calculateInvoice = async () => {
+    dispatch(orderSlice.actions.setLoadeing("loading"));
     const res = await fetch(
       "http://localhost:8000/api/orders/calculateInvoice",
       {
@@ -40,6 +41,7 @@ export default function OrdersMoreActions({
     );
     const data = await res.json();
     localStorage.setItem(`invoice`, JSON.stringify(data));
+    dispatch(orderSlice.actions.setLoadeing("idle"));
 
     window.open("/invoice", "_blank");
   };

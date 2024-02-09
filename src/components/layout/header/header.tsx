@@ -15,6 +15,7 @@ import {
 import NavLink, { NavLinkText } from "./navLink";
 import { Button } from "@/components/ui/button";
 import AuthManager from "@/components/auth/authManager";
+import Logo from "@/components/shared/logo";
 
 export default async function Header() {
   const session = await getCurrentSession();
@@ -23,14 +24,7 @@ export default async function Header() {
       <div className=" w-full h-[var(--header-height)] bg-background z-50 border-b border-input px-4 py-2 flex justify-between items-center ">
         <div className="flex gap-4">
           <Link href="/">
-            <Image
-              priority
-              className="text-center w-[35%]  relative top-[2px]"
-              src="/xappee_logo_large.png"
-              alt="xappee"
-              width="200"
-              height="200"
-            />
+           <Logo/>
           </Link>
           <div className="flex items-center gap-2">
             <NavLink href="/">

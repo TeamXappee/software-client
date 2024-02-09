@@ -5,7 +5,7 @@ import { fetchSoftDeletedOrdersThunkReducers } from "./thunks/fetchSoftDeletedOr
 
 import { restoreOrderThunkReucers } from "./thunks/restoreOrderThunk";
 
-import { createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 export interface OrderSliceInitialState {
   orders: any[];
@@ -28,7 +28,11 @@ const initialState: OrderSliceInitialState = {
 export const orderSlice = createSlice({
   name: "order",
   initialState,
-  reducers: {},
+  reducers: {
+    setLoadeing: (state, action: PayloadAction<"loading" | "idle">) => {
+      state.ordersStatus = action.payload;
+    },
+  },
   extraReducers(builder) {
     fetchOrdersThunkReducers(builder);
     fixOrdersThunkReducers(builder);

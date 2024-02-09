@@ -1,51 +1,71 @@
 "use client";
-import React from "react";
+import InvoiceByOrderTable from "@/components/invoice/invoiceByOrderTable";
+import React, { useEffect, useState } from "react";
+
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
+import { ArrowRightLeft, X } from "lucide-react";
+import Logo from "@/components/shared/logo";
+import { Button } from "@/components/ui/button";
+import { ToggleThemeBtn } from "@/components/shared/theme/toggleThemeBtn";
+import ChannelsMetadata from "@/components/invoice/channelsMetadata";
+import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+import OrdersSearch from "@/components/orders/ordersSearch";
 
 export default function Page() {
-  const [invoice, setInvoice] = React.useState<any>(undefined);
+  const [invoice, setInvoice] = useState<any>({});
+  const searchParams = useSearchParams();
+  const query = searchParams.get("query");
 
-  React.useEffect(() => {
-    const invoiceString = localStorage.getItem("invoice");
-    const loadedInvoice = invoiceString ? JSON.parse(invoiceString) : undefined;
-    setInvoice(loadedInvoice);
+  useEffect(() => {
+    // Fetch data from localStorage
+    const data = localStorage.getItem("invoice");
+    if (data) {
+      setInvoice(JSON.parse(data));
+    }
   }, []);
 
-  if (!invoice) {
-    return <p>No invoice data</p>;
-  }
 
-  const invoiceErrors = invoice.errors;
-  const carrierInvoice = Object.entries(invoice.carrierFeesMap || {}).reduce(
-    (newRecord: any, [key, value]) => {
-      newRecord[key] = value;
-      return newRecord;
-    },
-    {}
-  );
-
-  console.log(carrierInvoice);
 
   return (
-    <div className="p-4">
-      <section className="flex justify-between">
-        <h1 className="font-medium text-xl">INVOICE</h1>
-        <div className="flex gap-2">
-          <p
-            className={`flex items-center justify-center py-1 px-2 font-medium rounded-2xl 
-            ${invoiceErrors ? "bg-red-500/40" : "bg-green-500/40"}`}
-          >
-            {invoiceErrors ? `Errors ${invoiceErrors}` : "No errors"}
-          </p>
-        </div>
-      </section>
-      <section className="max-w-[450px] grid gap-2 mt-4">
-        {Object.entries(carrierInvoice).map(([key, value]: any) => (
-          <div className="grid grid-cols-2" key={key}>
-            <p>{key}</p>
-            <p>{value}</p>
+    <ResizablePanelGroup
+      direction="vertical"
+      className="min-h-[100vh] w-full rounded-lg border"
+    >
+      <ResizablePanel defaultSize={11} maxSize={15}>
+        <div className="flex justify-between items-start p-6">
+          <ChannelsMetadata
+            channelIds={invoice.channelIds}
+            dateRange={{ from: invoice.from, to: invoice.to }}
+          />
+          <Image
+            priority
+            className={`text-center w-[125px]   -left-[6.4rem] relative top-[2px]`}
+            src="/logo.png"
+            alt="xappee"
+            width="200"
+            height="200"
+          />
+
+          <div>
+            <div className="flex gap-2 items-start">
+              <Button className="gap-2 rounded-xl " variant={"outline"}>
+                Swich Invoice <ArrowRightLeft size={15} />
+              </Button>
+              <ToggleThemeBtn />
+            </div>
+            <OrdersSearch searchKey={"query"} ordersCount={1} />
           </div>
-        ))}
-      </section>
-    </div>
+        </div>
+      </ResizablePanel>
+      <ResizableHandle withHandle className="" />
+      <ResizablePanel className=" overflow-y-auto" defaultSize={89}>
+        <InvoiceByOrderTable orders={invoice.invoiceByOrder} />
+      </ResizablePanel>
+    </ResizablePanelGroup>
   );
 }

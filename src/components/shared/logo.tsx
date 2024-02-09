@@ -1,15 +1,15 @@
 import Image from "next/image";
 import React from "react";
 
-export default function Logo() {
+export default function Logo({ width }: { width?: number }) {
   return (
     <Image
-      src="/logo.png"
-      width={400}
-      height={200}
       priority
-      alt="Xappee"
-      className=" w-24 sm:w-28 object-contain "
+      className={`text-center w-[${width ?? 100}px]  relative top-[2px]`}
+      src="/logo.png"
+      alt="xappee"
+      width="200"
+      height="200"
     />
   );
 }
